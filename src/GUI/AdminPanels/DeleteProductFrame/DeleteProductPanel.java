@@ -44,8 +44,20 @@ public class DeleteProductPanel extends JPanel{
         cmbBoxProducts.setPreferredSize(new Dimension(140,20));
 
         btnDeleteProduct = new JButton("Delete product");
+        btnDeleteProduct.setSize(new Dimension(150, 25));
+        btnDeleteProduct.setPreferredSize(new Dimension(150, 25));
+        btnDeleteProduct.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        btnDeleteProduct.setOpaque(true);
+        btnDeleteProduct.setBorderPainted(false);
+        btnDeleteProduct.setBackground(Color.decode("#518A3D"));
 
         btnExit = new JButton("Exit");
+        btnExit.setSize(new Dimension(200, 25));
+        btnExit.setPreferredSize(new Dimension(100, 25));
+        btnExit.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        btnExit.setOpaque(true);
+        btnExit.setBorderPainted(false);
+        btnExit.setBackground(Color.decode("#518A3D"));
 
         GRAY_BACKGROUND_COLOR = Color.decode("#2b2b2b");
     }

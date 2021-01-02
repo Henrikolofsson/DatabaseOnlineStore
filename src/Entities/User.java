@@ -4,6 +4,7 @@ import Enums.Roles;
 
 public class User {
     private String userName;
+    private String firstName;
     private String password;
     private String lastName;
     private String email;
@@ -13,8 +14,9 @@ public class User {
     private String phone;
     private Roles role;
 
-    public User(String userName, String password, String lastName, String email, String address, String city, String country, String phone) {
+    public User(String userName, String firstName, String password, String lastName, String email, String address, String city, String country, String phone) {
         this.userName = userName;
+        this.firstName = firstName;
         this.password = password;
         this.lastName = lastName;
         this.email = email;
@@ -28,8 +30,16 @@ public class User {
         return userName;
     }
 
-    public void setUserName(String userName) {
+    public void setUserName(String userName){
         this.userName = userName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getPassword() {
@@ -99,7 +109,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "userName='" + userName + '\'' +
+                "userName='" + firstName + '\'' +
                 ", password='" + password + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +

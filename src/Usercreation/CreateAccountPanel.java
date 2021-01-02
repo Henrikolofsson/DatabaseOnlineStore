@@ -1,6 +1,7 @@
 package Usercreation;
 
 import Controller.MainController;
+import Database.DatabaseController;
 import Entities.User;
 import Enums.Countries;
 
@@ -8,13 +9,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CreateAccountPanel extends JPanel {
     private MainController controller;
-    private JLabel lblName;
+    private DatabaseController databaseController;
+    private JLabel lblUserName;
+    private JLabel lblFirstName;
     private JLabel lblLastName;
     private JLabel lblEmail;
     private JLabel lblAddress;
@@ -24,7 +26,8 @@ public class CreateAccountPanel extends JPanel {
     private JLabel lblPassword;
     private JLabel lblAdminPw;
 
-    private JTextField txtName;
+    private JTextField txtUserName;
+    private JTextField userFirstName;
     private JTextField txtLastName;
     private JTextField txtEmail;
     private JTextField txtAddress;
@@ -39,17 +42,26 @@ public class CreateAccountPanel extends JPanel {
 
     private Pattern pattern;
 
-    public CreateAccountPanel(MainController controller) {
+    public CreateAccountPanel(MainController controller, DatabaseController databaseController) {
         this.controller = controller;
+        this.databaseController = databaseController;
         initializeComponents();
         initializeGUI();
         registerListeners();
     }
 
     private void initializeComponents() {
-        lblName = new JLabel("Name: ");
-        lblName.setMinimumSize(new Dimension(80,20));
-        lblName.setPreferredSize(new Dimension(80,20));
+        lblUserName = new JLabel("Username: ");
+        lblUserName.setMinimumSize(new Dimension(80,20));
+        lblUserName.setPreferredSize(new Dimension(80,20));
+
+        txtUserName = new JTextField();
+        txtUserName.setMinimumSize(new Dimension(80,20));
+        txtUserName.setPreferredSize(new Dimension(80,20));
+
+        lblFirstName = new JLabel("First name: ");
+        lblFirstName.setMinimumSize(new Dimension(80,20));
+        lblFirstName.setPreferredSize(new Dimension(80,20));
 
         lblLastName = new JLabel("Last name: ");
         lblLastName.setMinimumSize(new Dimension(80,20));
@@ -76,9 +88,9 @@ public class CreateAccountPanel extends JPanel {
         lblPhone.setPreferredSize(new Dimension(80,20));
 
 
-        txtName = new JTextField();
-        txtName.setMinimumSize(new Dimension(80,20));
-        txtName.setPreferredSize(new Dimension(80,20));
+        userFirstName = new JTextField();
+        userFirstName.setMinimumSize(new Dimension(80,20));
+        userFirstName.setPreferredSize(new Dimension(80,20));
 
         txtLastName = new JTextField();
         txtLastName.setMinimumSize(new Dimension(80,20));
@@ -127,19 +139,19 @@ public class CreateAccountPanel extends JPanel {
     private void initializeGUI() {
         setLayout(new GridBagLayout());
         setBackground(GRAY_BACKGROUND_COLOR);
-        setPreferredSize(new Dimension(490, 500));
-        setMaximumSize(new Dimension(490,500));
-        setMinimumSize(new Dimension(490,500));
+        setPreferredSize(new Dimension(490, 600));
+        setMaximumSize(new Dimension(490,600));
+        setMinimumSize(new Dimension(490,600));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(lblName, gbc);
+        add(lblFirstName, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
-        add(txtName, gbc);
+        add(userFirstName, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -191,24 +203,32 @@ public class CreateAccountPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 7;
-        add(lblPassword, gbc);
+        add(lblUserName, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 7;
-        add(txtPassword, gbc);
+        add(txtUserName, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 8;
-        add(lblAdminPw, gbc);
+        add(lblPassword, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 8;
-        add(txtAdminPw, gbc);
+        add(txtPassword, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 9;
+        add(lblAdminPw, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 9;
+        add(txtAdminPw, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 10;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(40, 0, 0, 0);
+        gbc.insets = new Insets(0, 0, 0, 0);
         add(btnRegister, gbc);
 
     }
@@ -235,7 +255,8 @@ public class CreateAccountPanel extends JPanel {
             if(emailOK && phoneOK) {
                 //Check if all the other fields is filled
                 int countryIndex = cmbBoxCountry.getSelectedIndex();
-                String name = txtName.getText();
+                String userName = txtUserName.getText();
+                String firstName = userFirstName.getText();
                 String lastName = txtLastName.getText();
                 String address = txtAddress.getText();
                 String city = txtCity.getText();
@@ -247,25 +268,27 @@ public class CreateAccountPanel extends JPanel {
 
                 System.out.println("THE PW IS YOU FAGGOT: " + adminPassword);
 
-                if(!name.isEmpty() && !lastName.isEmpty() && !address.isEmpty() && !city.isEmpty() && !stringPassword.isEmpty()) {
+                if(!firstName.isEmpty() && !lastName.isEmpty() && !address.isEmpty() && !city.isEmpty() && !stringPassword.isEmpty()) {
                     //Everything OK
+                    if(databaseController.checkIfAlreadyExists(userName)){
 
-                    if(!adminPassword.isEmpty()) {
-                        //User is creating an admin account
-                        User admin = new User(name, stringPassword, lastName, email, address, city, country, phone);
-                        if(controller.createAdminUser(admin, adminPassword)) {
-                            JOptionPane.showMessageDialog(null, "Admin created!");
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Your admin password is not correct, you scam!");
-                        }
+                        if(!adminPassword.isEmpty()) {
+                            //User is creating an admin account
+                            User admin = new User(userName, firstName, stringPassword, lastName, email, address, city, country, phone);
+                            if(controller.createAdminUser(admin, adminPassword)) {
+                                JOptionPane.showMessageDialog(null, "Admin created!");
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Your admin password is not correct, you scam!");
+                            }
 
-                    } else {
-                        //User is creating regular account
-                        User regularUser = new User(name, stringPassword, lastName, email, address, city, country, phone);
-                        if(controller.createNormalUser(regularUser)) {
-                            JOptionPane.showMessageDialog(null, "User created!");
                         } else {
-                            JOptionPane.showMessageDialog(null, "Your user could not be created???? Hmm I wonder why..");
+                            //User is creating regular account
+                            User regularUser = new User(userName, firstName, stringPassword, lastName, email, address, city, country, phone);
+                            if(controller.createNormalUser(regularUser)) {
+                                JOptionPane.showMessageDialog(null, "User created!");
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Your user could not be created???? Hmm I wonder why..");
+                            }
                         }
                     }
                 } else {

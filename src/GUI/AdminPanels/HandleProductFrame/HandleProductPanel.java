@@ -38,9 +38,9 @@ public class HandleProductPanel extends JPanel {
     }
 
     private void initializeComponents() {
-        lblProductToEdit = new JLabel("Select product to edit");
-        lblProductToEdit.setMinimumSize(new Dimension(120,20));
-        lblProductToEdit.setPreferredSize(new Dimension(120,20));
+        lblProductToEdit = new JLabel("<html><div style='text-align: center;'>Select a product to edit</div></html>");
+        lblProductToEdit.setMinimumSize(new Dimension(140,20));
+        lblProductToEdit.setPreferredSize(new Dimension(140,20));
         lblProductToEdit.setForeground(Color.LIGHT_GRAY);
 
         cmbBoxProducts = new JComboBox<>();
@@ -68,12 +68,28 @@ public class HandleProductPanel extends JPanel {
         txtNewQuantity.setPreferredSize(new Dimension(50, 20));
 
         btnEditQuantity = new JButton("Edit quantity");
+        btnEditQuantity.setSize(new Dimension(100, 25));
+        btnEditQuantity.setPreferredSize(new Dimension(100, 25));
+        btnEditQuantity.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        btnEditQuantity.setOpaque(true);
+        btnEditQuantity.setBorderPainted(false);
+        btnEditQuantity.setBackground(Color.decode("#518A3D"));
 
         btnAddDiscountPeriod = new JButton("Add discount period");
+        btnAddDiscountPeriod.setSize(new Dimension(200, 25));
+        btnAddDiscountPeriod.setPreferredSize(new Dimension(200, 25));
+        btnAddDiscountPeriod.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        btnAddDiscountPeriod.setOpaque(true);
+        btnAddDiscountPeriod.setBorderPainted(false);
+        btnAddDiscountPeriod.setBackground(Color.decode("#518A3D"));
 
         btnExit = new JButton("Exit");
-
-
+        btnExit.setSize(new Dimension(100, 25));
+        btnExit.setPreferredSize(new Dimension(100, 25));
+        btnExit.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        btnExit.setOpaque(true);
+        btnExit.setBorderPainted(false);
+        btnExit.setBackground(Color.decode("#518A3D"));
 
         GRAY_BACKGROUND_COLOR = Color.decode("#2b2b2b");
     }
@@ -100,6 +116,7 @@ public class HandleProductPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 2;
+        gbc.gridwidth = 1;
         add(lblNewQuantity, gbc);
 
         gbc.gridx = 1;
@@ -113,6 +130,7 @@ public class HandleProductPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 4;
+        gbc.gridwidth = 1;
         add(lblAddDiscountPeriod, gbc);
 
         gbc.gridx = 1;

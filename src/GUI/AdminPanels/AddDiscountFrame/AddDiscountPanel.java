@@ -62,8 +62,20 @@ public class AddDiscountPanel extends JPanel {
         txtDiscountReason.setPreferredSize(new Dimension(120,20));
 
         btnAddDiscount = new JButton("Add discount");
+        btnAddDiscount.setSize(new Dimension(150, 25));
+        btnAddDiscount.setPreferredSize(new Dimension(150, 25));
+        btnAddDiscount.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        btnAddDiscount.setOpaque(true);
+        btnAddDiscount.setBorderPainted(false);
+        btnAddDiscount.setBackground(Color.decode("#518A3D"));
 
         btnExit = new JButton("Exit");
+        btnExit.setSize(new Dimension(200, 25));
+        btnExit.setPreferredSize(new Dimension(100, 25));
+        btnExit.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        btnExit.setOpaque(true);
+        btnExit.setBorderPainted(false);
+        btnExit.setBackground(Color.decode("#518A3D"));
 
         GRAY_BACKGROUND_COLOR = Color.decode("#2b2b2b");
     }
@@ -76,7 +88,9 @@ public class AddDiscountPanel extends JPanel {
         setMinimumSize(new Dimension(500,400));
 
         GridBagConstraints gbc = new GridBagConstraints();
+
         gbc.insets = new Insets(10, 10, 10, 10);
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(lblDiscountCode, gbc);

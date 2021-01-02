@@ -81,8 +81,20 @@ public class AddProductPanel extends JPanel{
         lblDiscounts.setForeground(Color.LIGHT_GRAY);
 
         btnAddProduct = new JButton("Add product");
+        btnAddProduct.setSize(new Dimension(200, 25));
+        btnAddProduct.setPreferredSize(new Dimension(100, 25));
+        btnAddProduct.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        btnAddProduct.setOpaque(true);
+        btnAddProduct.setBorderPainted(false);
+        btnAddProduct.setBackground(Color.decode("#518A3D"));
 
         btnExit = new JButton("Exit");
+        btnExit.setSize(new Dimension(200, 25));
+        btnExit.setPreferredSize(new Dimension(100, 25));
+        btnExit.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        btnExit.setOpaque(true);
+        btnExit.setBorderPainted(false);
+        btnExit.setBackground(Color.decode("#518A3D"));
 
         GRAY_BACKGROUND_COLOR = Color.decode("#2b2b2b");
     }

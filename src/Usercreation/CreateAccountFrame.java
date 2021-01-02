@@ -1,17 +1,21 @@
 package Usercreation;
 
 import Controller.MainController;
+import Database.DatabaseController;
 import GUI.ApplicationMainPanel;
 
 import javax.swing.*;
+import javax.xml.crypto.Data;
 import java.awt.*;
 
 public class CreateAccountFrame extends JFrame {
     private MainController controller;
+    private DatabaseController databaseController;
     private CreateAccountPanel accountPanel;
 
-    public CreateAccountFrame(MainController controller) {
+    public CreateAccountFrame(MainController controller, DatabaseController databaseController) {
         this.controller = controller;
+        this.databaseController = databaseController;
         initializeComponents();
         initializeGUI();
     }
@@ -24,10 +28,11 @@ public class CreateAccountFrame extends JFrame {
         setMinimumSize(new Dimension(600, 500));
         setPreferredSize(new Dimension(600,500));
         setVisible(true);
+        setResizable(false);
         setBackground(Color.WHITE);
         setLayout(new GridLayout(1,2, 1, 0));
 
-        accountPanel = new CreateAccountPanel(controller);
+        accountPanel = new CreateAccountPanel(controller, databaseController);
     }
 
     private void initializeGUI() {
@@ -40,6 +45,6 @@ public class CreateAccountFrame extends JFrame {
         add(accountPanel,gbc);
 
         pack();
-        setLocation(new Point(300, 100));
+        //setLocation(new Point(300, 100));
     }
 }

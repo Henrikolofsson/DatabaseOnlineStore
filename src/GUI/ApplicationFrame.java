@@ -1,16 +1,19 @@
 package GUI;
 
 import Controller.MainController;
+import Database.DatabaseController;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class ApplicationFrame extends JFrame {
     private MainController controller;
+    private DatabaseController databaseController;
     private ApplicationMainPanel mainPanel;
 
-    public ApplicationFrame(MainController controller) {
+    public ApplicationFrame(MainController controller, DatabaseController databaseController) {
         this.controller = controller;
+        this.databaseController = databaseController;
         initializeComponents();
         initializeGUI();
     }
@@ -23,8 +26,9 @@ public class ApplicationFrame extends JFrame {
         setMinimumSize(new Dimension(600, 800));
         setPreferredSize(new Dimension(600,800));
         setVisible(true);
+        setResizable(false);
         setBackground(Color.WHITE);
-        setLayout(new GridLayout(1,2, 1, 0));
+        setLayout(new GridBagLayout());
 
         mainPanel = new ApplicationMainPanel(controller);
     }
