@@ -22,9 +22,9 @@ public class HandleProductFrame extends JFrame {
     private void initializeComponents() {
         //Default JFrame initializations
         setTitle("Handle product");
-        setSize(new Dimension(600,400));
-        setMinimumSize(new Dimension(600, 400));
-        setPreferredSize(new Dimension(600,400));
+        setSize(new Dimension(600,600));
+        setMinimumSize(new Dimension(600, 600));
+        setPreferredSize(new Dimension(600,600));
         setDefaultCloseOperation(this.EXIT_ON_CLOSE);
         setVisible(true);
         setResizable(false);

@@ -159,4 +159,8 @@ public class MainController {
     public void openHandleProductFrame() {
         handleProductFrame = new HandleProductFrame(this, databaseController);
     }
+
+    public void sendToAddDiscountPeriod(String startDate, String endDate, String productNameToUpdate, String discountToSetDate) {
+        databaseController.AddDiscountPeriod(startDate, endDate, productNameToUpdate, discountToSetDate);
+    }
 }

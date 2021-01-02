@@ -589,4 +589,48 @@ public class DatabaseController {
         disconnect();
         return firstname;
     }
+
+    public boolean AddDiscountPeriod(String startDate, String endDate, String productNameToUpdate, String discountToSetDate) {
+        connect();
+
+        try {
+            int discountCode = 0;
+
+            PreparedStatement stmt = connection.prepareStatement(
+                    "SELECT discount_code\n" +
+                    "FROM discounts\n" +
+                    "WHERE discount_reason = '" + discountToSetDate + "';");
+
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()){
+                discountCode = rs.getInt(1);
+            }
+
+            String addDiscountToProductQuery =
+                    "UPDATE discounts\n" +
+                    "SET discount_startdate = ?, discount_enddate = ?\n" +
+                    "WHERE discount_code = ?;\n" +
+                    "UPDATE products\n" +
+                    "SET discount_code = ?\n" +
+                    "WHERE product_name = ?;";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(addDiscountToProductQuery);
+            preparedStatement.setDate(1, Date.valueOf(startDate));
+            preparedStatement.setDate(2, Date.valueOf(endDate));
+            preparedStatement.setBigDecimal(3, new BigDecimal(discountCode));
+            preparedStatement.setBigDecimal(4, new BigDecimal(discountCode));
+            preparedStatement.setString(5, productNameToUpdate);
+
+            preparedStatement.execute();
+            connection.close();
+            disconnect();
+            JOptionPane.showMessageDialog(null, "Discount to product added!");
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        disconnect();
+        return false;
+    }
 }
