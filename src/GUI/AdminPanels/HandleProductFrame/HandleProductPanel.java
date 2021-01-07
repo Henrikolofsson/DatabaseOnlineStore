@@ -19,7 +19,6 @@ public class HandleProductPanel extends JPanel {
     private JLabel lblAddDiscountStart;
     private JLabel lblAddDiscountEnd;
     private JLabel lblUnusedDiscounts;
-    private JLabel lblUsedDiscounts;
 
     private JTextField txtNewQuantity;
     private JTextField txtAddDiscountStart;
@@ -27,11 +26,9 @@ public class HandleProductPanel extends JPanel {
 
     private JComboBox<String> cmbBoxProducts;
     private JComboBox<String> cmbBoxUnusedDiscounts;
-    private JComboBox<String> cmbBoxUsedDiscounts;
 
     private JButton btnEditQuantity;
     private JButton btnAddUnusedDiscount;
-    private JButton btnAddUsedDiscount;
     private JButton btnExit;
 
     private Color GRAY_BACKGROUND_COLOR;
@@ -55,13 +52,17 @@ public class HandleProductPanel extends JPanel {
         for(int i = 0; i < controller.getProducts().size(); i++){
             cmbBoxProducts.addItem(controller.getProducts().get(i));
         }
+        cmbBoxProducts.setBackground(Color.decode("#2b2b2b"));
+        cmbBoxProducts.setForeground(Color.LIGHT_GRAY);
+        cmbBoxProducts.setOpaque(true);
+        cmbBoxProducts.setFont(new Font("Helvetica", Font.BOLD, 12));
 
         lblNewQuantity = new JLabel("New Quantity: ");
         lblNewQuantity.setMinimumSize(new Dimension(120,20));
         lblNewQuantity.setPreferredSize(new Dimension(120,20));
         lblNewQuantity.setForeground(Color.LIGHT_GRAY);
 
-        lblUnusedDiscounts = new JLabel("Unused discounts:");
+        lblUnusedDiscounts = new JLabel("Discounts:");
         lblUnusedDiscounts.setMinimumSize(new Dimension(120,20));
         lblUnusedDiscounts.setPreferredSize(new Dimension(120,20));
         lblUnusedDiscounts.setForeground(Color.LIGHT_GRAY);
@@ -70,16 +71,10 @@ public class HandleProductPanel extends JPanel {
         for(int i = 0; i < controller.getDiscounts().size(); i++){
             cmbBoxUnusedDiscounts.addItem(controller.getDiscounts().get(i));
         }
-
-        lblUsedDiscounts = new JLabel("Used discounts:");
-        lblUsedDiscounts.setMinimumSize(new Dimension(120,20));
-        lblUsedDiscounts.setPreferredSize(new Dimension(120,20));
-        lblUsedDiscounts.setForeground(Color.LIGHT_GRAY);
-
-        cmbBoxUsedDiscounts = new JComboBox<>();
-        for(int i = 0; i < controller.getDiscounts().size(); i++){
-            cmbBoxUsedDiscounts.addItem("TO BE ADDED");
-        }
+        cmbBoxUnusedDiscounts.setBackground(Color.decode("#2b2b2b"));
+        cmbBoxUnusedDiscounts.setForeground(Color.LIGHT_GRAY);
+        cmbBoxUnusedDiscounts.setOpaque(true);
+        cmbBoxUnusedDiscounts.setFont(new Font("Helvetica", Font.BOLD, 12));
 
         lblAddDiscountStart = new JLabel("Discount startdate:");
         lblAddDiscountStart.setMinimumSize(new Dimension(120,20));
@@ -95,15 +90,27 @@ public class HandleProductPanel extends JPanel {
         txtAddDiscountStart.setSize(new Dimension(100, 20));
         txtAddDiscountStart.setPreferredSize(new Dimension(100, 20));
         txtAddDiscountStart.setText("YYYY-MM-DD");
+        txtAddDiscountStart.setBackground(GRAY_BACKGROUND_COLOR);
+        txtAddDiscountStart.setForeground(Color.LIGHT_GRAY);
+        txtAddDiscountStart.setOpaque(true);
+        txtAddDiscountStart.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         txtAddDiscountEnd = new JTextField();
         txtAddDiscountEnd.setSize(new Dimension(100, 20));
         txtAddDiscountEnd.setPreferredSize(new Dimension(100, 20));
         txtAddDiscountEnd.setText("YYYY-MM-DD");
+        txtAddDiscountEnd.setBackground(GRAY_BACKGROUND_COLOR);
+        txtAddDiscountEnd.setForeground(Color.LIGHT_GRAY);
+        txtAddDiscountEnd.setOpaque(true);
+        txtAddDiscountEnd.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         txtNewQuantity = new JTextField();
         txtNewQuantity.setSize(new Dimension(50, 20));
         txtNewQuantity.setPreferredSize(new Dimension(50, 20));
+        txtNewQuantity.setBackground(GRAY_BACKGROUND_COLOR);
+        txtNewQuantity.setForeground(Color.LIGHT_GRAY);
+        txtNewQuantity.setOpaque(true);
+        txtNewQuantity.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         btnEditQuantity = new JButton("Edit quantity");
         btnEditQuantity.setSize(new Dimension(100, 25));
@@ -120,14 +127,6 @@ public class HandleProductPanel extends JPanel {
         btnAddUnusedDiscount.setOpaque(true);
         btnAddUnusedDiscount.setBorderPainted(false);
         btnAddUnusedDiscount.setBackground(Color.decode("#518A3D"));
-
-        btnAddUsedDiscount = new JButton("Update and add discount");
-        btnAddUsedDiscount.setSize(new Dimension(200, 25));
-        btnAddUsedDiscount.setPreferredSize(new Dimension(200, 25));
-        btnAddUsedDiscount.setFont(new Font("Helvetica", Font.PLAIN, 12));
-        btnAddUsedDiscount.setOpaque(true);
-        btnAddUsedDiscount.setBorderPainted(false);
-        btnAddUsedDiscount.setBackground(Color.decode("#518A3D"));
 
         btnExit = new JButton("Exit");
         btnExit.setSize(new Dimension(100, 25));
@@ -185,40 +184,27 @@ public class HandleProductPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 5;
-        add(lblUsedDiscounts, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 5;
-        add(cmbBoxUsedDiscounts, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 6;
         add(lblAddDiscountStart, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 6;
+        gbc.gridy = 5;
         add(txtAddDiscountStart, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 7;
+        gbc.gridy = 6;
         add(lblAddDiscountEnd, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 7;
+        gbc.gridy = 6;
         add(txtAddDiscountEnd, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = 7;
         gbc.gridwidth = 2;
         add(btnAddUnusedDiscount, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 9;
-        gbc.gridwidth = 2;
-        add(btnAddUsedDiscount, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 10;
+        gbc.gridy = 8;
         gbc.gridwidth = 2;
         add(btnExit, gbc);
     }

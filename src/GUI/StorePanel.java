@@ -46,9 +46,9 @@ public class StorePanel extends JPanel {
         defaultListModel = new DefaultListModel<>();
 
         listProducts = new JList<>(defaultListModel);
-        listProducts.setSize(new Dimension(600, 300));
-        listProducts.setPreferredSize(new Dimension(600, 300));
-        listProducts.setMinimumSize(new Dimension(600, 300));
+        listProducts.setSize(new Dimension(900, 300));
+        listProducts.setPreferredSize(new Dimension(900, 300));
+        listProducts.setMinimumSize(new Dimension(900, 300));
 
         scrollPane = new JScrollPane(listProducts, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setSize(new Dimension(500, 300));
@@ -74,8 +74,8 @@ public class StorePanel extends JPanel {
 
     public void updateProductList(){
         defaultListModel.removeAllElements();
-        for(int i = 0; i < applicationMainPanel.getAllProducts().size(); i++){
-            defaultListModel.addElement(applicationMainPanel.getAllProducts().get(i));
+        for(int i = 0; i < applicationMainPanel.getAllProductsUser().size(); i++){
+            defaultListModel.addElement(applicationMainPanel.getAllProductsUser().get(i));
         }
     }
 

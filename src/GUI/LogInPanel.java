@@ -112,10 +112,12 @@ public class LogInPanel extends JPanel {
 
             if(!applicationMainPanel.isUserNormal(userNameLogin, passwordLogin) && applicationMainPanel.isUserAdmin(userNameLogin, passwordLogin)) {
                 applicationMainPanel.updateAdminView();
-                applicationMainPanel.updaateAdminFirstName();
+                applicationMainPanel.updateAdminFirstName();
+                applicationMainPanel.setAdminViewTitle();
             } else if(applicationMainPanel.isUserNormal(userNameLogin, passwordLogin) && !applicationMainPanel.isUserAdmin(userNameLogin, passwordLogin)){
                 applicationMainPanel.updateUserView();
                 applicationMainPanel.updateUserFirstName();
+                applicationMainPanel.setUserViewTitle();
             } else {
                 JOptionPane.showMessageDialog(null, "Wrong login credentials!");
             }

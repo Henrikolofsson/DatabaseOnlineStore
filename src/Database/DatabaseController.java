@@ -82,8 +82,6 @@ public class DatabaseController {
            ResultSet rs = statement.executeQuery();
 
            while(rs.next()) {
-               System.out.println("Password: " + rs.getString(1) + " ");
-               System.out.println(password);
                if(rs.getString(1).equals(password)) {
                    return true;
                }
@@ -105,8 +103,6 @@ public class DatabaseController {
            ResultSet rs = statement.executeQuery();
 
            while (rs.next()) {
-               System.out.println("Username Checked: " + rs.getString(1) + " ");
-               System.out.println("Username entered: " + username);
                if (rs.getString(1).equals(username)) {
                    JOptionPane.showMessageDialog(null, "This username already exists.\nPlease choose a different username.");
 
@@ -130,8 +126,6 @@ public class DatabaseController {
            ResultSet rs = statement.executeQuery();
 
            while (rs.next()) {
-               System.out.println("Username Checked: " + rs.getString(1) + " ");
-               System.out.println("Username entered: " + username);
                if (rs.getString(1).equals(username)) {
                    JOptionPane.showMessageDialog(null, "This username already exists.\nPlease choose a different username.");
 
@@ -443,13 +437,48 @@ public class DatabaseController {
        return products;
     }
 
+    public ArrayList<String> getProductsForUsers() {
+        ArrayList<String> products = new ArrayList<>();
+        connect();
+        try {
+            String query =
+                    """
+                            SELECT product_name FROM products 
+                            WHERE product_quantity > 0
+                            ORDER BY product_name ASC""";
+
+            PreparedStatement stmt = connection.prepareStatement(query);
+
+            ResultSet rs = stmt.executeQuery();
+            int i = 0;
+            while(rs.next()) {
+                products.add(i, rs.getString(1));
+                i++;
+            }
+            stmt.close();
+            rs.close();
+            disconnect();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        disconnect();
+        return products;
+    }
+
     public boolean deleteProduct(String productNameToDelete) {
         connect();
 
+        /* TODO:
+        KUNNA TA BORT PRODUKT ÄVEN OM DISCOUNT ÄR APPLICERAD. DETTA GÅR I NULÄGET INTE PGA ATT
+        used_discounts ANVÄNDER PRODUCT_ID SOM PRIMARY KEY. KAN ENKELT FIXAS MED ATT HÄMTA ID FRÅN products OCH
+        APPLICERA DEN PÅ used_discounts. FRÅGAN ÄR: SKA 'BORTTAGNA' PRODUKTER SYNAS NÄR MAN KOLLAR GAMLA PRODUKTERS
+        DISCOUNT HISTORY? MAN HADE KUNANT SPARA PRODUCT_ID SOM EN SEPARAT KOLUMN MEN DÅ BLIR DET ÖVERFLÖDIG DATA
+         */
+
         try {
-            System.out.println("STRING TO DELETE: " + productNameToDelete);
             String query =
-                    "DELETE FROM products WHERE LOWER(product_name) LIKE ?";
+                    """
+                        DELETE FROM products WHERE LOWER(product_name) LIKE ?""";
 
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, productNameToDelete.toLowerCase());
@@ -493,49 +522,109 @@ public class DatabaseController {
         return allProducts;
     }
 
-    public ArrayList<String> getSearchedProducts(String searchedCode, String searchedSupplier, String searchedProduct) {
-        ArrayList<String> searchedProducts = new ArrayList<>();
+    public ArrayList<String> getUserSearchedProducts(String searchedCode, String searchedString, String searchedProduct) {
+        ArrayList<String> searchedProductsUser = new ArrayList<>();
         connect();
         try {
-            String query =
-                    "SELECT product_id, product_name, product_quantity, product_price, product_supplier FROM products\n" +
-                            "WHERE product_id = ?\n" +
-                            "  OR LOWER(product_name) LIKE ?\n" +
-                            "  OR LOWER(product_supplier) LIKE ?\n" +
-                            "  ORDER BY product_id ASC";
+            String query = "";
+            if(searchedString.toLowerCase().equals("discounts")){
+                 query =
+                         """
+                                 SELECT pt.product_id, pt.product_name, pt.product_quantity, pt.product_price, pt.product_supplier, dt.discount_reason, dt.discount_percentage 
+                                 FROM products pt
+                                 INNER JOIN used_discounts udt ON pt.product_id = udt.product_id
+                                 LEFT JOIN discounts dt ON dt.discount_code = udt.used_discount_id
+                                 AND udt.used_discount_id = dt.discount_code
+                                 WHERE product_quantity > 0
+                                 AND pt.discount_code IS NOT NULL
+                                 AND udt.used_discount_enddate > CURRENT_DATE
+                                 ORDER BY pt.product_id ASC""";
 
-            PreparedStatement stmt = connection.prepareStatement(query);
+                PreparedStatement stmt = connection.prepareStatement(query);
 
-            if(searchedCode == null){
-                stmt.setNull(1, Types.INTEGER);
-                stmt.setString(2, "%" + searchedSupplier.toLowerCase() + "%");
-                stmt.setString(3,  "%" + searchedProduct.toLowerCase() + "%");
+                ResultSet rs = stmt.executeQuery();
+
+                int i = 0;
+                while(rs.next()) {
+                    String discountReason = rs.getString(6);
+                    double calcDiscount = (rs.getDouble(4) * rs.getDouble(7));
+                    double finalPrice = Math.round((rs.getDouble(4) - calcDiscount));
+
+
+                    String productToAdd =
+                            "Code: "+ rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
+                                    " | Price: " + finalPrice + ":- | Discount reason: " + discountReason + " | Discount Percentage: " + Math.round(rs.getDouble(7) * 100) +
+                                    "% | Supplier: " + rs.getString(5);
+                    searchedProductsUser.add(i, productToAdd);
+                    i++;
+                }
+                stmt.close();
+                rs.close();
             } else {
-                int codeInt = Integer.parseInt(searchedCode);
-                stmt.setBigDecimal(1, new BigDecimal(codeInt));
-                stmt.setNull(2, Types.VARCHAR);
-                stmt.setNull(3, Types.VARCHAR);
-            }
+                 query =
+                         """
+                                 SELECT pt.product_id, pt.product_name, pt.product_quantity, pt.product_price, pt.product_supplier, dt.discount_reason, dt.discount_percentage\s
+                                 FROM products pt
+                                 LEFT JOIN discounts dt ON dt.discount_code = pt.discount_code
+                                 WHERE product_quantity > 0
+                                 AND product_id = ?
+                                 OR LOWER(product_name) LIKE ?
+                                 OR LOWER(product_name) LIKE ?
+                                 ORDER BY pt.product_id ASC""";
 
-            ResultSet rs = stmt.executeQuery();
-            int i = 0;
-            while(rs.next()) {
-                String productToAdd =
-                        "Code: "+ rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
-                        " | Base Price: " + rs.getString(4) + ":- | Supplier: " + rs.getString(5);
-                searchedProducts.add(i, productToAdd);
-                i++;
-            }
+                PreparedStatement stmt = connection.prepareStatement(query);
 
-            stmt.close();
-            rs.close();
-            disconnect();
+                if(searchedCode == null){
+                    stmt.setNull(1, Types.INTEGER);
+                    stmt.setString(2, searchedString.toLowerCase());
+                    stmt.setString(3,  searchedString.toLowerCase());
+                } else {
+                    int codeInt = Integer.parseInt(searchedCode);
+                    stmt.setBigDecimal(1, new BigDecimal(codeInt));
+                    stmt.setNull(2, Types.VARCHAR);
+                    stmt.setNull(3, Types.VARCHAR);
+                }
+
+                ResultSet rs = stmt.executeQuery();
+
+                int i = 0;
+
+                while(rs.next()) {
+                    String discountReason = "";
+                    double calcDiscount = 1;
+                    double finalPrice = 0;
+                    String productToAdd = "";
+
+                    if(rs.getString(6) == null){
+                        discountReason = "None";
+                        finalPrice = rs.getDouble(4);
+                        productToAdd =
+                                "Code: "+ rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
+                                        " | Price: " + finalPrice + ":- | Discount reason: " + discountReason +
+                                        " | Supplier: " + rs.getString(5);
+                        searchedProductsUser.add(i, productToAdd);
+                        continue;
+
+                    } else {
+                        discountReason = rs.getString(6);
+                        calcDiscount = (rs.getDouble(4) * rs.getDouble(7));
+                        finalPrice = Math.round((rs.getDouble(4) - calcDiscount));
+                    }
+                    productToAdd =
+                            "Code: "+ rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
+                                    " | Price: " + finalPrice + ":- | Discount reason: " + discountReason + " | Discount Percentage: " + Math.round(rs.getDouble(7) * 100) +
+                                    "% | Supplier: " + rs.getString(5);
+                    searchedProductsUser.add(i, productToAdd);
+                    i++;
+                }
+                stmt.close();
+                rs.close();
+            }
         } catch(SQLException e) {
             e.printStackTrace();
         }
         disconnect();
-        return searchedProducts;
-
+        return searchedProductsUser;
     }
 
     public boolean updateQuantity(int newQuantity, String productNameToUpdate) {
@@ -573,7 +662,6 @@ public class DatabaseController {
             ResultSet rs = stmt.executeQuery();
 
             while(rs.next()) {
-                System.out.println("RESULT: " + rs.getString(3));
                 if(rs.getString(1).toLowerCase().equals(usernameLogin.toLowerCase()) && rs.getString(2).equals(passwordLogin)) {
                     firstname = rs.getString(3);
 
@@ -590,7 +678,7 @@ public class DatabaseController {
         return firstname;
     }
 
-    public boolean AddDiscountPeriod(String startDate, String endDate, String productNameToUpdate, String discountToSetDate) {
+    public boolean AddDiscountUnusedPeriod(String startDate, String endDate, String productNameToUpdate, String discountToSetDate) {
         connect();
 
         try {
@@ -607,30 +695,92 @@ public class DatabaseController {
                 discountCode = rs.getInt(1);
             }
 
-            String addDiscountToProductQuery =
-                    "UPDATE discounts\n" +
-                    "SET discount_startdate = ?, discount_enddate = ?\n" +
-                    "WHERE discount_code = ?;\n" +
-                    "UPDATE products\n" +
-                    "SET discount_code = ?\n" +
-                    "WHERE product_name = ?;";
+            String query =
+                    """
+                            UPDATE products
+                            SET discount_code = ?
+                            WHERE product_name = ?;""";
 
-            PreparedStatement preparedStatement = connection.prepareStatement(addDiscountToProductQuery);
-            preparedStatement.setDate(1, Date.valueOf(startDate));
-            preparedStatement.setDate(2, Date.valueOf(endDate));
-            preparedStatement.setBigDecimal(3, new BigDecimal(discountCode));
-            preparedStatement.setBigDecimal(4, new BigDecimal(discountCode));
-            preparedStatement.setString(5, productNameToUpdate);
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setBigDecimal(1, new BigDecimal(discountCode));
+            preparedStatement.setString(2, productNameToUpdate);
 
             preparedStatement.execute();
+
+            PreparedStatement stmt2 = connection.prepareStatement(
+                    "SELECT product_id\n" +
+                        "FROM products\n" +
+                        "WHERE product_name = '" + productNameToUpdate + "';");
+
+            ResultSet rs1 = stmt2.executeQuery();
+
+            int productCode = 0;
+
+            while(rs1.next()){
+                productCode = rs1.getInt(1);
+            }
+
+            String addToUsedDiscounts =
+                    """
+                        INSERT INTO used_discounts (used_discount_id, used_discount_startdate, used_discount_enddate, product_id) 
+                        VALUES (?, ?, ?, ?)""";
+
+            PreparedStatement preparedStatement1 = connection.prepareStatement(addToUsedDiscounts);
+            preparedStatement1.setBigDecimal(1, new BigDecimal(discountCode));
+            preparedStatement1.setDate(2, Date.valueOf(startDate));
+            preparedStatement1.setDate(3, Date.valueOf(endDate));
+            preparedStatement1.setBigDecimal(4, new BigDecimal(productCode));
+
+            preparedStatement1.execute();
             connection.close();
             disconnect();
             JOptionPane.showMessageDialog(null, "Discount to product added!");
             return true;
         } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "This product is already assigned to this discount");
             e.printStackTrace();
         }
         disconnect();
         return false;
+    }
+
+    public ArrayList<String> getUsedDiscounts() {
+        ArrayList<String> usedDiscounts = new ArrayList<>();
+
+        connect();
+        try {
+            String query =
+                    """
+                            SELECT pt.product_name, udt.used_discount_startdate, udt.used_discount_enddate, dt.discount_percentage, dt.discount_reason, pt.product_price
+                            FROM used_discounts udt
+                            INNER JOIN products pt on udt.product_id = pt.product_id
+                            LEFT JOIN discounts dt on udt.used_discount_id = dt.discount_code
+                            WHERE udt.product_id = pt.product_id
+                            ORDER BY dt.discount_reason ASC""";
+
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+            int i = 0;
+            while(rs.next()) {
+                double percentage = (Math.round(rs.getDouble(4) * 100));
+                double calcDiscount = (rs.getDouble(6) * rs.getDouble(4));
+                double finalPrice = Math.round((rs.getDouble(6) - calcDiscount));
+
+                String strUsedDiscounts =
+                        rs.getString(1) + " | " + rs.getString(2) + "-" +
+                        rs.getString(3) + " | " + percentage + "% | " +
+                        rs.getString(5) + " | " + finalPrice + ":-";
+
+                usedDiscounts.add(i, strUsedDiscounts);
+                i++;
+            }
+            stmt.close();
+            rs.close();
+            disconnect();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        disconnect();
+        return usedDiscounts;
     }
 }

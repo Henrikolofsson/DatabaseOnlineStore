@@ -2,7 +2,7 @@ package GUI.AdminPanels.AddSupplierFrame;
 
 import Controller.MainController;
 import Database.DatabaseController;
-import Usercreation.CreateAccountPanel;
+import GUI.Usercreation.CreateAccountPanel;
 
 import javax.swing.*;
 import java.awt.*;

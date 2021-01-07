@@ -159,7 +159,27 @@ public class ApplicationMainPanel extends JPanel {
         pnlUserMain.updateFirstname();
     }
 
-    public void updaateAdminFirstName() {
+    public void updateAdminFirstName() {
         pnlAdminMain.updateFirstName();
+    }
+
+    public void openViewUsedDiscountsFrame() {
+        controller.openViewUsedDiscountsFrame();
+    }
+
+    public void updateUsedDiscounts() {
+        controller.updateUsedDiscounts();
+    }
+
+    public void setAdminViewTitle() {
+        controller.setAdminViewTitle();
+    }
+
+    public void setUserViewTitle() {
+        controller.setUserViewTitle();
+    }
+
+    public ArrayList<String> getAllProductsUser() {
+        return controller.getAllProductsUser();
     }
 }

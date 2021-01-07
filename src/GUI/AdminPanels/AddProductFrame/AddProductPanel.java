@@ -44,6 +44,10 @@ public class AddProductPanel extends JPanel{
         txtProductName = new JTextField();
         txtProductName.setMinimumSize(new Dimension(120,20));
         txtProductName.setPreferredSize(new Dimension(120,20));
+        txtProductName.setBackground(GRAY_BACKGROUND_COLOR);
+        txtProductName.setForeground(Color.LIGHT_GRAY);
+        txtProductName.setOpaque(true);
+        txtProductName.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         lblProductQuantity = new JLabel("Product quantity: ");
         lblProductQuantity.setMinimumSize(new Dimension(120,20));
@@ -53,6 +57,10 @@ public class AddProductPanel extends JPanel{
         txtProductQuantity = new JTextField();
         txtProductQuantity.setMinimumSize(new Dimension(120,20));
         txtProductQuantity.setPreferredSize(new Dimension(120,20));
+        txtProductQuantity.setBackground(GRAY_BACKGROUND_COLOR);
+        txtProductQuantity.setForeground(Color.LIGHT_GRAY);
+        txtProductQuantity.setOpaque(true);
+        txtProductQuantity.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         lblProductBasePrice = new JLabel("Product base price: ");
         lblProductBasePrice.setMinimumSize(new Dimension(120,20));
@@ -62,6 +70,10 @@ public class AddProductPanel extends JPanel{
         txtProductBasePrice = new JTextField();
         txtProductBasePrice.setMinimumSize(new Dimension(120,20));
         txtProductBasePrice.setPreferredSize(new Dimension(120,20));
+        txtProductBasePrice.setBackground(GRAY_BACKGROUND_COLOR);
+        txtProductBasePrice.setForeground(Color.LIGHT_GRAY);
+        txtProductBasePrice.setOpaque(true);
+        txtProductBasePrice.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         lblProductSupplier = new JLabel("Product supplier: ");
         lblProductSupplier.setMinimumSize(new Dimension(120,20));
@@ -74,6 +86,10 @@ public class AddProductPanel extends JPanel{
         }
         cmbBoxSupplier.setMinimumSize(new Dimension(120,20));
         cmbBoxSupplier.setPreferredSize(new Dimension(120,20));
+        cmbBoxSupplier.setBackground(Color.decode("#2b2b2b"));
+        cmbBoxSupplier.setForeground(Color.LIGHT_GRAY);
+        cmbBoxSupplier.setOpaque(true);
+        cmbBoxSupplier.setFont(new Font("Helvetica", Font.BOLD, 12));
 
         lblDiscounts = new JLabel("Discount type: ");
         lblDiscounts.setMinimumSize(new Dimension(120,20));

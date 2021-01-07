@@ -82,4 +82,12 @@ public class AdminMainPanel extends JPanel {
     public void updateFirstName() {
         adminStorePanel.updateFirstname();
     }
+
+    public void openViewUsedDiscountsFrame() {
+        applicationMainPanel.openViewUsedDiscountsFrame();
+    }
+
+    public void updateUsedDiscounts() {
+        applicationMainPanel.updateUsedDiscounts();
+    }
 }

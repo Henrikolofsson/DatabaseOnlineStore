@@ -8,9 +8,10 @@ import GUI.AdminPanels.AddProductFrame.AddProductFrame;
 import GUI.AdminPanels.AddSupplierFrame.AddSupplierFrame;
 import GUI.AdminPanels.DeleteProductFrame.DeleteProductFrame;
 import GUI.AdminPanels.HandleProductFrame.HandleProductFrame;
+import GUI.AdminPanels.ViewUsedDiscountsFrame.ViewUsedDiscountsFrame;
 import GUI.ApplicationFrame;
 import GUI.ApplicationMainPanel;
-import Usercreation.CreateAccountFrame;
+import GUI.Usercreation.CreateAccountFrame;
 
 import java.util.ArrayList;
 
@@ -23,6 +24,7 @@ public class MainController {
     private ApplicationMainPanel applicationMainPanel;
     private AddDiscountFrame addDiscountFrame;
     private HandleProductFrame handleProductFrame;
+    private ViewUsedDiscountsFrame viewUsedDiscountsFrame;
     private Login login;
     private String firstName;
     private DeleteProductFrame deleteProductFrame;
@@ -149,7 +151,7 @@ public class MainController {
     }
 
     public ArrayList<String> getSearchedProducts(String searchedCode, String searchedSupplier, String searchedProduct) {
-        return databaseController.getSearchedProducts(searchedCode, searchedSupplier, searchedProduct);
+        return databaseController.getUserSearchedProducts(searchedCode, searchedSupplier, searchedProduct);
     }
 
     public void sendToUpdateQuantity(int newQuantity, String productNameToUpdate) {
@@ -161,6 +163,30 @@ public class MainController {
     }
 
     public void sendToAddDiscountPeriod(String startDate, String endDate, String productNameToUpdate, String discountToSetDate) {
-        databaseController.AddDiscountPeriod(startDate, endDate, productNameToUpdate, discountToSetDate);
+        databaseController.AddDiscountUnusedPeriod(startDate, endDate, productNameToUpdate, discountToSetDate);
+    }
+
+    public ArrayList<String> getUsedDiscounts() {
+        return databaseController.getUsedDiscounts();
+    }
+
+    public void openViewUsedDiscountsFrame() {
+        viewUsedDiscountsFrame = new ViewUsedDiscountsFrame(this, databaseController);
+    }
+
+    public void updateUsedDiscounts() {
+        viewUsedDiscountsFrame.updateUsedDiscounts();
+    }
+
+    public void setAdminViewTitle() {
+        applicationFrame.setAdminViewTitle();
+    }
+
+    public void setUserViewTitle() {
+        applicationFrame.setUserViewTitle();
+    }
+
+    public ArrayList<String> getAllProductsUser() {
+        return databaseController.getProductsForUsers();
     }
 }

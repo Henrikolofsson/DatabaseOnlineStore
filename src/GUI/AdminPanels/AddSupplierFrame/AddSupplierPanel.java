@@ -51,6 +51,10 @@ public class AddSupplierPanel extends JPanel{
         txtSupplierName = new JTextField();
         txtSupplierName.setMinimumSize(new Dimension(120,20));
         txtSupplierName.setPreferredSize(new Dimension(120,20));
+        txtSupplierName.setBackground(GRAY_BACKGROUND_COLOR);
+        txtSupplierName.setForeground(Color.LIGHT_GRAY);
+        txtSupplierName.setOpaque(true);
+        txtSupplierName.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         lblSupplierPhone = new JLabel("Supplier phone: ");
         lblSupplierPhone.setMinimumSize(new Dimension(120,20));
@@ -60,6 +64,10 @@ public class AddSupplierPanel extends JPanel{
         txtSupplierPhone = new JTextField();
         txtSupplierPhone.setMinimumSize(new Dimension(120,20));
         txtSupplierPhone.setPreferredSize(new Dimension(120,20));
+        txtSupplierPhone.setBackground(GRAY_BACKGROUND_COLOR);
+        txtSupplierPhone.setForeground(Color.LIGHT_GRAY);
+        txtSupplierPhone.setOpaque(true);
+        txtSupplierPhone.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         lblSupplierAddress = new JLabel("Supplier address: ");
         lblSupplierAddress.setMinimumSize(new Dimension(120,20));
@@ -69,6 +77,10 @@ public class AddSupplierPanel extends JPanel{
         txtSupplierAddress = new JTextField();
         txtSupplierAddress.setMinimumSize(new Dimension(120,20));
         txtSupplierAddress.setPreferredSize(new Dimension(120,20));
+        txtSupplierAddress.setBackground(GRAY_BACKGROUND_COLOR);
+        txtSupplierAddress.setForeground(Color.LIGHT_GRAY);
+        txtSupplierAddress.setOpaque(true);
+        txtSupplierAddress.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         lblSupplierCity = new JLabel("Supplier city: ");
         lblSupplierCity.setMinimumSize(new Dimension(120,20));
@@ -78,15 +90,23 @@ public class AddSupplierPanel extends JPanel{
         txtSupplierCity = new JTextField();
         txtSupplierCity.setMinimumSize(new Dimension(120,20));
         txtSupplierCity.setPreferredSize(new Dimension(120,20));
+        txtSupplierCity.setBackground(GRAY_BACKGROUND_COLOR);
+        txtSupplierCity.setForeground(Color.LIGHT_GRAY);
+        txtSupplierCity.setOpaque(true);
+        txtSupplierCity.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         lblSupplierCountry = new JLabel("Supplier country: ");
         lblSupplierCountry.setMinimumSize(new Dimension(120,20));
         lblSupplierCountry.setPreferredSize(new Dimension(120,20));
         lblSupplierCountry.setForeground(Color.LIGHT_GRAY);
 
-        cmbBoxCountries = new JComboBox<Countries>(controller.getCountries());
+        cmbBoxCountries = new JComboBox<>(controller.getCountries());
         cmbBoxCountries.setMinimumSize(new Dimension(120,20));
         cmbBoxCountries.setPreferredSize(new Dimension(120,20));
+        cmbBoxCountries.setBackground(Color.decode("#2b2b2b"));
+        cmbBoxCountries.setForeground(Color.LIGHT_GRAY);
+        cmbBoxCountries.setOpaque(true);
+        cmbBoxCountries.setFont(new Font("Helvetica", Font.BOLD, 12));
 
         btnAddSupplier = new JButton("Add supplier");
         btnAddSupplier.setSize(new Dimension(150, 25));

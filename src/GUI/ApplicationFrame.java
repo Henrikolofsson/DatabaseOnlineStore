@@ -45,5 +45,11 @@ public class ApplicationFrame extends JFrame {
         setLocation(new Point(500, 100));
     }
 
+    public void setAdminViewTitle(){
+        setTitle("Admin View");
+    }
 
+    public void setUserViewTitle(){
+        setTitle("User View");
+    }
 }

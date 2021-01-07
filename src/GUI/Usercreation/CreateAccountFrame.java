@@ -1,11 +1,9 @@
-package Usercreation;
+package GUI.Usercreation;
 
 import Controller.MainController;
 import Database.DatabaseController;
-import GUI.ApplicationMainPanel;
 
 import javax.swing.*;
-import javax.xml.crypto.Data;
 import java.awt.*;
 
 public class CreateAccountFrame extends JFrame {

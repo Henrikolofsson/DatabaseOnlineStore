@@ -17,6 +17,7 @@ public class UserStorePanel extends JPanel {
 
     private JButton btnSearch;
     private JButton btnUpdate;
+    private JButton btnAddProduct;
 
 
     public UserStorePanel(UserMainPanel userMainPanel){

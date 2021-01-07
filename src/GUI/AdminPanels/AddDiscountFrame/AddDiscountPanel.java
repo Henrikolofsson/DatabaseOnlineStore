@@ -42,6 +42,10 @@ public class AddDiscountPanel extends JPanel {
         txtDiscountCode = new JTextField();
         txtDiscountCode.setMinimumSize(new Dimension(120,20));
         txtDiscountCode.setPreferredSize(new Dimension(120,20));
+        txtDiscountCode.setBackground(GRAY_BACKGROUND_COLOR);
+        txtDiscountCode.setForeground(Color.LIGHT_GRAY);
+        txtDiscountCode.setOpaque(true);
+        txtDiscountCode.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         lblDiscountPercentage = new JLabel("Discount percentage: ");
         lblDiscountPercentage.setMinimumSize(new Dimension(120,20));
@@ -51,6 +55,10 @@ public class AddDiscountPanel extends JPanel {
         txtDiscountPercentage = new JTextField();
         txtDiscountPercentage.setMinimumSize(new Dimension(120,20));
         txtDiscountPercentage.setPreferredSize(new Dimension(120,20));
+        txtDiscountPercentage.setBackground(GRAY_BACKGROUND_COLOR);
+        txtDiscountPercentage.setForeground(Color.LIGHT_GRAY);
+        txtDiscountPercentage.setOpaque(true);
+        txtDiscountPercentage.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         lblDiscountReason = new JLabel("Discount reason: ");
         lblDiscountReason.setMinimumSize(new Dimension(120,20));
@@ -60,6 +68,10 @@ public class AddDiscountPanel extends JPanel {
         txtDiscountReason = new JTextField();
         txtDiscountReason.setMinimumSize(new Dimension(120,20));
         txtDiscountReason.setPreferredSize(new Dimension(120,20));
+        txtDiscountReason.setBackground(GRAY_BACKGROUND_COLOR);
+        txtDiscountReason.setForeground(Color.LIGHT_GRAY);
+        txtDiscountReason.setOpaque(true);
+        txtDiscountReason.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         btnAddDiscount = new JButton("Add discount");
         btnAddDiscount.setSize(new Dimension(150, 25));
