@@ -1,4 +1,4 @@
-package GUI.Usercreation;
+package Usercreation;
 
 import Controller.MainController;
 import Database.DatabaseController;
