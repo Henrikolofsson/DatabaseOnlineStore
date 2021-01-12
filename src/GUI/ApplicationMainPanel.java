@@ -1,7 +1,6 @@
 package GUI;
 
 import Controller.MainController;
-import Entities.Admin;
 import GUI.AdminPanels.AdminMainPanel;
 import GUI.UserPanels.UserMainPanel;
 
@@ -181,5 +180,25 @@ public class ApplicationMainPanel extends JPanel {
 
     public ArrayList<String> getAllProductsUser() {
         return controller.getAllProductsUser();
+    }
+
+    public boolean checkQuantity(int nbrOfItems, int productID) {
+        return controller.checkQuantity(nbrOfItems, productID);
+    }
+
+    public void openShoppingcart() {
+        controller.openShoppingCart();
+    }
+
+    public void getOrderedProducts(int productID, int nbrOfItems) {
+        controller.getProductsOrdered(productID, nbrOfItems);
+    }
+
+    public void openHandleOrdersFrame() {
+        controller.openHandleOrdersFrame();
+    }
+
+    public ArrayList<String> getProductsForCustomers() {
+        return controller.getProductsForCustomers();
     }
 }

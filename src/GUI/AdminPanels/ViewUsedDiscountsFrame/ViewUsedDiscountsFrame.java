@@ -10,11 +10,9 @@ import java.awt.*;
 public class ViewUsedDiscountsFrame extends JFrame {
     private MainController controller;
     private ViewUsedDiscountsPanel viewUsedDiscountsPanel;
-    private DatabaseController databaseController;
 
-    public ViewUsedDiscountsFrame(MainController controller, DatabaseController databaseController) {
+    public ViewUsedDiscountsFrame(MainController controller) {
         this.controller = controller;
-        this.databaseController = databaseController;
         initializeComponents();
         initializeGUI();
     }
@@ -38,7 +36,6 @@ public class ViewUsedDiscountsFrame extends JFrame {
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.ipadx = 100;
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(viewUsedDiscountsPanel, gbc);

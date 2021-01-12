@@ -74,8 +74,8 @@ public class StorePanel extends JPanel {
 
     public void updateProductList(){
         defaultListModel.removeAllElements();
-        for(int i = 0; i < applicationMainPanel.getAllProductsUser().size(); i++){
-            defaultListModel.addElement(applicationMainPanel.getAllProductsUser().get(i));
+        for(int i = 0; i < applicationMainPanel.getProductsForCustomers().size(); i++){
+            defaultListModel.addElement(applicationMainPanel.getProductsForCustomers().get(i));
         }
     }
 

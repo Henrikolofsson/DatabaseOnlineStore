@@ -7,10 +7,12 @@ import GUI.AdminPanels.AddDiscountFrame.AddDiscountFrame;
 import GUI.AdminPanels.AddProductFrame.AddProductFrame;
 import GUI.AdminPanels.AddSupplierFrame.AddSupplierFrame;
 import GUI.AdminPanels.DeleteProductFrame.DeleteProductFrame;
+import GUI.AdminPanels.HandleOrders.HandleOrdersFrame;
 import GUI.AdminPanels.HandleProductFrame.HandleProductFrame;
 import GUI.AdminPanels.ViewUsedDiscountsFrame.ViewUsedDiscountsFrame;
 import GUI.ApplicationFrame;
 import GUI.ApplicationMainPanel;
+import GUI.UserPanels.ShoppingCartFrame.ShoppingCartFrame;
 import GUI.Usercreation.CreateAccountFrame;
 
 import java.util.ArrayList;
@@ -25,9 +27,11 @@ public class MainController {
     private AddDiscountFrame addDiscountFrame;
     private HandleProductFrame handleProductFrame;
     private ViewUsedDiscountsFrame viewUsedDiscountsFrame;
+    private ShoppingCartFrame shoppingCartFrame;
     private Login login;
     private String firstName;
     private DeleteProductFrame deleteProductFrame;
+    private HandleOrdersFrame handleOrdersFrame;
 
     public MainController(DatabaseController databaseController) {
         this.databaseController = databaseController;
@@ -171,7 +175,7 @@ public class MainController {
     }
 
     public void openViewUsedDiscountsFrame() {
-        viewUsedDiscountsFrame = new ViewUsedDiscountsFrame(this, databaseController);
+        viewUsedDiscountsFrame = new ViewUsedDiscountsFrame(this);
     }
 
     public void updateUsedDiscounts() {
@@ -188,5 +192,33 @@ public class MainController {
 
     public ArrayList<String> getAllProductsUser() {
         return databaseController.getProductsForUsers();
+    }
+
+    public boolean checkQuantity(int nbrOfItems, int productID) {
+        return databaseController.checkQuantity(nbrOfItems, productID);
+    }
+
+   public ArrayList<String> getOrderedProduct(int productID, int nbrOfItems) {
+        return databaseController.getOrderedProduct(productID, nbrOfItems);
+    }
+
+    public void openShoppingCart() {
+        shoppingCartFrame = new ShoppingCartFrame(this);
+    }
+
+    public ArrayList<String> getProductsOrdered(int productID, int nbrOfItems) {
+        return databaseController.getOrderedProduct(productID, nbrOfItems);
+    }
+
+    public void openHandleOrdersFrame() {
+        handleOrdersFrame = new HandleOrdersFrame(this, databaseController);
+    }
+
+    public ArrayList<String> getOrdersList() {
+        return databaseController.getOrdersList();
+    }
+
+    public ArrayList<String> getProductsForCustomers() {
+        return databaseController.getProductsForCustomers();
     }
 }

@@ -38,7 +38,6 @@ public class AddDiscountFrame extends JFrame {
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.ipadx = 100;
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(addDiscountPanel, gbc);

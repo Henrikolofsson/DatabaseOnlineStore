@@ -90,4 +90,8 @@ public class AdminMainPanel extends JPanel {
     public void updateUsedDiscounts() {
         applicationMainPanel.updateUsedDiscounts();
     }
+
+    public void openHandleOrdersFrame() {
+        applicationMainPanel.openHandleOrdersFrame();
+    }
 }

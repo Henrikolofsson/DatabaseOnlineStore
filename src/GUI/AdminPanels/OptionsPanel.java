@@ -87,7 +87,7 @@ public class OptionsPanel extends JPanel {
                 adminMainPanel.openHandleProductFrame();
             }
             if(cmbBoxOptions.getSelectedIndex() == 5){
-                //adminMainPanel.openHandleOrdersFrame();
+                adminMainPanel.openHandleOrdersFrame();
             }
             if(cmbBoxOptions.getSelectedIndex() == 6){
                 adminMainPanel.openViewUsedDiscountsFrame();

@@ -11,6 +11,8 @@ public class UserStorePanel extends JPanel {
     private DefaultListModel<String> defaultListModel;
     private JScrollPane scrollPane;
 
+    int productsAdded;
+
     private JLabel lblWelcome;
 
     private JTextField txtSearch;
@@ -22,6 +24,7 @@ public class UserStorePanel extends JPanel {
 
     public UserStorePanel(UserMainPanel userMainPanel){
         this.userMainPanel = userMainPanel;
+        productsAdded = 0;
 
         initializeComponents();
         updateProductList();
@@ -44,9 +47,9 @@ public class UserStorePanel extends JPanel {
         defaultListModel = new DefaultListModel<>();
 
         listProducts = new JList<>(defaultListModel);
-        listProducts.setSize(new Dimension(600, 300));
-        listProducts.setPreferredSize(new Dimension(600, 300));
-        listProducts.setMinimumSize(new Dimension(600, 300));
+        listProducts.setSize(new Dimension(900, 300));
+        listProducts.setPreferredSize(new Dimension(900, 300));
+        listProducts.setMinimumSize(new Dimension(900, 300));
 
         scrollPane = new JScrollPane(listProducts, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setSize(new Dimension(500, 300));
@@ -68,6 +71,14 @@ public class UserStorePanel extends JPanel {
         btnUpdate.setOpaque(true);
         btnUpdate.setBorderPainted(false);
         btnUpdate.setBackground(Color.decode("#518A3D"));
+
+        btnAddProduct = new JButton("Add product");
+        btnAddProduct.setSize(new Dimension(200, 25));
+        btnAddProduct.setPreferredSize(new Dimension(100, 25));
+        btnAddProduct.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        btnAddProduct.setOpaque(true);
+        btnAddProduct.setBorderPainted(false);
+        btnAddProduct.setBackground(Color.decode("#518A3D"));
     }
 
     private void initializeGUI() {
@@ -105,8 +116,12 @@ public class UserStorePanel extends JPanel {
 
         gbc.gridy = 3;
         gbc.gridx = 0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 1;
         add(btnUpdate, gbc);
+
+        gbc.gridy = 3;
+        gbc.gridx = 1;
+        add(btnAddProduct, gbc);
     }
 
     public void updateFirstname(){
@@ -115,8 +130,8 @@ public class UserStorePanel extends JPanel {
 
     public void updateProductList(){
         defaultListModel.removeAllElements();
-        for(int i = 0; i < userMainPanel.getAllProducts().size(); i++){
-            defaultListModel.addElement(userMainPanel.getAllProducts().get(i));
+        for(int i = 0; i < userMainPanel.getProductsForCustomers().size(); i++){
+            defaultListModel.addElement(userMainPanel.getProductsForCustomers().get(i));
         }
     }
 
@@ -133,6 +148,7 @@ public class UserStorePanel extends JPanel {
     private void registerListeners(){
         btnSearch.addActionListener(new BtnSearchActionListener());
         btnUpdate.addActionListener(new BtnUpdateActionListener());
+        btnAddProduct.addActionListener(new BtnAddProductListener());
     }
 
     public static boolean isParsable(String searchedCode) {
@@ -169,7 +185,6 @@ public class UserStorePanel extends JPanel {
                 userMainPanel.getAllProducts();
                 updateProductList();
             }
-
         }
     }
 
@@ -179,6 +194,43 @@ public class UserStorePanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             userMainPanel.getAllProducts();
             updateProductList();
+        }
+    }
+
+    private int getIdFromString(){
+        if(!listProducts.isSelectionEmpty()){
+            String str = String.valueOf(listProducts.getSelectedValue());
+            String result = str.substring(6, str.indexOf("|")-1);
+            System.out.println(result);
+            return Integer.parseInt(result);
+        } else {
+            JOptionPane.showMessageDialog(null, "Select a product before adding!");
+            return -1;
+        }
+
+    }
+
+    private class BtnAddProductListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if(getIdFromString() > 0){
+                    int nbrOfItems = Integer.parseInt(JOptionPane.showInputDialog("How many items?"));
+                    int productID = getIdFromString();
+                    if(userMainPanel.checkQuantity(nbrOfItems, productID)){
+                        JOptionPane.showMessageDialog(null, "Product added!");
+                        productsAdded++;
+                        userMainPanel.updateShoppingCartBtn(productsAdded);
+                        userMainPanel.getOrderedProducts(productID, nbrOfItems);
+                        updateProductList();
+                    }
+                }
+            } catch (NumberFormatException n) {
+                n.printStackTrace();
+                JOptionPane.showMessageDialog(null,"Enter a real number!");
+            }
+
         }
     }
 }

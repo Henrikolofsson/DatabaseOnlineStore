@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class DatabaseController {
     private static String DB_URL = "jdbc:postgresql://localhost:5432/onlinestore";
@@ -473,7 +474,7 @@ public class DatabaseController {
         used_discounts ANVÄNDER PRODUCT_ID SOM PRIMARY KEY. KAN ENKELT FIXAS MED ATT HÄMTA ID FRÅN products OCH
         APPLICERA DEN PÅ used_discounts. FRÅGAN ÄR: SKA 'BORTTAGNA' PRODUKTER SYNAS NÄR MAN KOLLAR GAMLA PRODUKTERS
         DISCOUNT HISTORY? MAN HADE KUNANT SPARA PRODUCT_ID SOM EN SEPARAT KOLUMN MEN DÅ BLIR DET ÖVERFLÖDIG DATA
-         */
+        */
 
         try {
             String query =
@@ -522,6 +523,88 @@ public class DatabaseController {
         return allProducts;
     }
 
+    public ArrayList<String> getProductsForCustomers(){
+        ArrayList<String> products = new ArrayList<>();
+        connect();
+        String query = "";
+        int j = 0;
+
+        try{
+            query =
+                    """
+                            SELECT pt.product_id, pt.product_name, pt.product_quantity, pt.product_price, pt.product_supplier, dt.discount_reason, dt.discount_percentage\s
+                            FROM products pt
+                            INNER JOIN used_discounts udt ON pt.product_id = udt.product_id
+                            LEFT JOIN discounts dt ON dt.discount_code = udt.used_discount_id
+                            AND udt.used_discount_id = dt.discount_code
+                            WHERE udt.used_discount_enddate > CURRENT_DATE
+                            AND pt.product_quantity > 0
+                            ORDER BY pt.product_id ASC""";
+
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+            int i = 0;
+            while(rs.next()) {
+                String discountReason = rs.getString(6);
+                double calcDiscount = (rs.getDouble(4) * rs.getDouble(7));
+                double finalPrice = Math.round((rs.getDouble(4) - calcDiscount));
+
+                String productToAdd =
+                        "Code: "+ rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
+                                " | Price: " + finalPrice + ":- | Discount reason: " + discountReason + " | Discount Percentage: " + Math.round(rs.getDouble(7) * 100) +
+                                "% | Supplier: " + rs.getString(5);
+                products.add(i, productToAdd);
+                i++;
+                j++;
+            }
+
+            stmt.close();
+            rs.close();
+            disconnect();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        connect();
+
+        try {
+            query =
+                    """
+                            SELECT pt.product_id, pt.product_name, pt.product_quantity, pt.product_price, pt.product_supplier, dt.discount_reason, dt.discount_percentage
+                            FROM products pt
+                            LEFT JOIN discounts dt ON dt.discount_code = pt.discount_code
+                            WHERE product_quantity > 0
+                            AND discount_reason IS NULL
+                            ORDER BY pt.product_id ASC""";
+
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()) {
+                String discountReason = "";
+                double finalPrice = 0;
+                String productToAdd = "";
+
+                discountReason = "None";
+                finalPrice = rs.getDouble(4);
+                productToAdd =
+                        "Code: " + rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
+                                " | Price: " + finalPrice + ":- | Discount reason: " + discountReason +
+                                " | Supplier: " + rs.getString(5);
+                products.add(j, productToAdd);
+                j++;
+            }
+
+            stmt.close();
+            rs.close();
+            disconnect();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        Collections.sort(products);
+        return products;
+    }
+
     public ArrayList<String> getUserSearchedProducts(String searchedCode, String searchedString, String searchedProduct) {
         ArrayList<String> searchedProductsUser = new ArrayList<>();
         connect();
@@ -563,7 +646,7 @@ public class DatabaseController {
             } else {
                  query =
                          """
-                                 SELECT pt.product_id, pt.product_name, pt.product_quantity, pt.product_price, pt.product_supplier, dt.discount_reason, dt.discount_percentage\s
+                                 SELECT pt.product_id, pt.product_name, pt.product_quantity, pt.product_price, pt.product_supplier, dt.discount_reason, dt.discount_percentage
                                  FROM products pt
                                  LEFT JOIN discounts dt ON dt.discount_code = pt.discount_code
                                  WHERE product_quantity > 0
@@ -715,7 +798,6 @@ public class DatabaseController {
             ResultSet rs1 = stmt2.executeQuery();
 
             int productCode = 0;
-
             while(rs1.next()){
                 productCode = rs1.getInt(1);
             }
@@ -782,5 +864,101 @@ public class DatabaseController {
         }
         disconnect();
         return usedDiscounts;
+    }
+
+    public boolean checkQuantity(int nbrOfItems, int productID) {
+        connect();
+
+        int quantity = 0;
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT product_quantity FROM products WHERE (product_id) = ?");
+            stmt.setBigDecimal(1, new BigDecimal(productID));
+            ResultSet rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                quantity = rs.getInt(1);
+            }
+
+            stmt.close();
+            rs.close();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        if(quantity < nbrOfItems) {
+            JOptionPane.showMessageDialog(null, "You added more products than there are available");
+            return false;
+        } else {
+            int newQuantity = (quantity - nbrOfItems);
+            addProductToShoppingCart(newQuantity, productID);
+            return true;
+        }
+    }
+
+    private void addProductToShoppingCart(int newQuantity, int productID) {
+        connect();
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(
+                    """
+                            UPDATE products
+                            SET product_quantity = ?
+                            WHERE product_id = ?"""
+            );
+            stmt.setBigDecimal(1, new BigDecimal(newQuantity));
+            stmt.setBigDecimal(2, new BigDecimal(productID));
+            stmt.executeUpdate();
+
+            stmt.close();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        /*try {
+            PreparedStatement stmt = connection.prepareStatement(
+                    """
+
+                            """
+            );
+            stmt.setBigDecimal(1, new BigDecimal(newQuantity));
+            stmt.setBigDecimal(2, new BigDecimal(productID));
+            ResultSet rs = stmt.executeQuery();
+
+            stmt.close();
+            rs.close();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }*/
+    }
+
+    public ArrayList<String> getOrderedProduct(int productID, int nbrOfItems) {
+        ArrayList<String> productsAdded = new ArrayList<>();
+
+        return productsAdded;
+    }
+
+    public ArrayList<String> getOrdersList() {
+        ArrayList<String> orders = new ArrayList<>();
+        connect();
+
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    """
+                    
+                    """);
+            ResultSet rs = statement.executeQuery();
+
+            while(rs.next()) {
+
+            }
+            statement.close();
+            rs.close();
+            disconnect();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return orders;
     }
 }

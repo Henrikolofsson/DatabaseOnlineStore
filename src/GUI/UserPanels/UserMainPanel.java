@@ -1,8 +1,7 @@
 package GUI.UserPanels;
 
-import GUI.AdminPanels.AdminStorePanel;
-import GUI.AdminPanels.OptionsPanel;
 import GUI.ApplicationMainPanel;
+import GUI.UserPanels.ShoppingCartFrame.ShoppingCartPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,5 +57,25 @@ public class UserMainPanel extends JPanel {
 
     public void updateFirstname() {
         userStorePanel.updateFirstname();
+    }
+
+    public boolean checkQuantity(int nbrOfItems, int productID) {
+        return applicationMainPanel.checkQuantity(nbrOfItems, productID);
+    }
+
+    public void updateShoppingCartBtn(int productsAdded) {
+        optionsPanel.updateShoppingCartBtn(productsAdded);
+    }
+
+    public void getOrderedProducts(int productID, int nbrOfItems) {
+
+    }
+
+    public void openShoppingCart() {
+        applicationMainPanel.openShoppingcart();
+    }
+
+    public ArrayList<String> getProductsForCustomers() {
+        return applicationMainPanel.getProductsForCustomers();
     }
 }
