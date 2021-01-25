@@ -1,17 +1,24 @@
 package GUI.UserPanels;
 
+import Controller.MainController;
+import Entities.ComboBoxItem;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 
 public class UserStorePanel extends JPanel {
     private UserMainPanel userMainPanel;
+    private MainController controller;
     private JList listProducts;
-    private DefaultListModel<String> defaultListModel;
+    private DefaultListModel<ComboBoxItem> defaultListModel;
     private JScrollPane scrollPane;
 
     int productsAdded;
+
+    private JComboBox<String> cmbChoice;
 
     private JLabel lblWelcome;
 
@@ -22,12 +29,12 @@ public class UserStorePanel extends JPanel {
     private JButton btnAddProduct;
 
 
-    public UserStorePanel(UserMainPanel userMainPanel){
+    public UserStorePanel(UserMainPanel userMainPanel, MainController controller){
         this.userMainPanel = userMainPanel;
+        this.controller = controller;
         productsAdded = 0;
 
         initializeComponents();
-        updateProductList();
         initializeGUI();
         registerListeners();
     }
@@ -35,10 +42,22 @@ public class UserStorePanel extends JPanel {
     private void initializeComponents() {
         txtSearch = new JTextField();
         txtSearch.setForeground(Color.BLACK);
-        txtSearch.setSize(new Dimension(400, 25));
-        txtSearch.setPreferredSize(new Dimension(400, 25));
-        txtSearch.setMinimumSize(new Dimension(400, 25));
+        txtSearch.setSize(new Dimension(200, 25));
+        txtSearch.setPreferredSize(new Dimension(200, 25));
+        txtSearch.setMinimumSize(new Dimension(200, 25));
         txtSearch.setToolTipText("Search for products by code, name or supplier...");
+
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
+        model.addElement("Show all products");
+        model.addElement("Search for product");
+        model.addElement("Show all discounts");
+        model.addElement("View my orders");
+        model.addElement("Show by product id");
+        model.addElement("Show products by supplier");
+        cmbChoice = new JComboBox<>(model);
+        cmbChoice.setSize(new Dimension(200, 25));
+        cmbChoice.setPreferredSize(new Dimension(200, 25));
+        cmbChoice.setMinimumSize(new Dimension(200, 25));
 
         lblWelcome = new JLabel("Welcome, ");
         lblWelcome.setFont(new Font("Helvetica", Font.BOLD, 24));
@@ -96,22 +115,29 @@ public class UserStorePanel extends JPanel {
         gbc.gridwidth = 2;
         add(lblWelcome, gbc);
 
-        gbc.insets = new Insets(0, 0, 0, 0);
 
         gbc.gridy = 1;
         gbc.gridx = 0;
         gbc.gridwidth = 1;
+        gbc.insets = new Insets(50, 0, 0, 0);
         add(txtSearch, gbc);
 
         gbc.gridy = 1;
         gbc.gridx = 1;
-        add(btnSearch, gbc);
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(50, 0, 0, 0);
+        add(cmbChoice, gbc);
 
-        gbc.insets = new Insets(10, 0, 10, 0);
+        gbc.gridy = 1;
+        gbc.gridx = 2;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(50, 0, 0, 0);
+        add(btnSearch, gbc);
 
         gbc.gridy = 2;
         gbc.gridx = 0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
+        gbc.insets = new Insets(10, 0, 10, 0);
         add(scrollPane, gbc);
 
         gbc.gridy = 3;
@@ -124,24 +150,18 @@ public class UserStorePanel extends JPanel {
         add(btnAddProduct, gbc);
     }
 
-    public void updateFirstname(){
-        lblWelcome.setText("Welcome, " + userMainPanel.getFirstname() + "!");
+    public void updateFirstname(String userName){
+        lblWelcome.setText("Welcome, " + userName + "!");
     }
 
-    public void updateProductList(){
+    public void updateProductList(Vector<ComboBoxItem> items){
         defaultListModel.removeAllElements();
-        for(int i = 0; i < userMainPanel.getProductsForCustomers().size(); i++){
-            defaultListModel.addElement(userMainPanel.getProductsForCustomers().get(i));
-        }
-    }
-
-    public void updateSearchedProducts(String searchedCode, String searchedSupplier, String searchedProduct){
-        defaultListModel.removeAllElements();
-        for(int i = 0; i < userMainPanel.getSearchedProducts(searchedCode, searchedSupplier, searchedProduct).size(); i++){
-            defaultListModel.addElement(userMainPanel.getSearchedProducts(searchedCode, searchedSupplier, searchedProduct).get(i));
-        }
-        if(defaultListModel.isEmpty()){
-            defaultListModel.addElement("No products found");
+        if(items.isEmpty()) {
+            defaultListModel.addElement(new ComboBoxItem("No products found", -1));
+        } else {
+            for(int i = 0; i < items.size(); i++){
+                defaultListModel.addElement(items.get(i));
+            }
         }
     }
 
@@ -151,39 +171,27 @@ public class UserStorePanel extends JPanel {
         btnAddProduct.addActionListener(new BtnAddProductListener());
     }
 
-    public static boolean isParsable(String searchedCode) {
-        try {
-            Integer.parseInt(searchedCode);
-            return true;
-        } catch (final NumberFormatException e) {
-            return false;
-        }
-    }
 
     private class BtnSearchActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String searchedCode = txtSearch.getText();
-            String searchedSupplier = txtSearch.getText();
-            String searchedProduct = txtSearch.getText();
-
-            if(isParsable(searchedCode)){
-                searchedProduct = null;
-                searchedSupplier = null;
-            }
-            else {
-                searchedCode = null;
-            }
-
-            System.out.println(searchedCode + searchedProduct + searchedSupplier);
-
-            if(!txtSearch.getText().isEmpty()){
-                userMainPanel.getSearchedProducts(searchedCode, searchedSupplier, searchedProduct);
-                updateSearchedProducts(searchedCode, searchedSupplier, searchedProduct);
+            int index = cmbChoice.getSelectedIndex();
+            if(index == 0) {
+                updateProductList(controller.getAllProducts());
+            } else if(index == 1) {
+                controller.btnPressed("SearchForProducts");
+                updateProductList(controller.getProductsByName(txtSearch.getText()));
+            } else if(index == 2) {
+                controller.btnPressed("GetAllDiscounts");
+                updateProductList(controller.getAllDiscountedProducts());
+            } else if(index == 3) {
+                controller.btnPressed("ViewOrders");
+            } else if(index == 4) {
+                controller.btnPressed("SearchForProductsById");
+                updateProductList(controller.getProductsById(txtSearch.getText()));
             } else {
-                userMainPanel.getAllProducts();
-                updateProductList();
+                controller.btnPressed("SearchForProductsBySupplier");
             }
         }
     }
@@ -192,44 +200,15 @@ public class UserStorePanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            userMainPanel.getAllProducts();
-            updateProductList();
+
         }
     }
 
-    private int getIdFromString(){
-        if(!listProducts.isSelectionEmpty()){
-            String str = String.valueOf(listProducts.getSelectedValue());
-            String result = str.substring(6, str.indexOf("|")-1);
-            System.out.println(result);
-            return Integer.parseInt(result);
-        } else {
-            JOptionPane.showMessageDialog(null, "Select a product before adding!");
-            return -1;
-        }
-
-    }
 
     private class BtnAddProductListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                if(getIdFromString() > 0){
-                    int nbrOfItems = Integer.parseInt(JOptionPane.showInputDialog("How many items?"));
-                    int productID = getIdFromString();
-                    if(userMainPanel.checkQuantity(nbrOfItems, productID)){
-                        JOptionPane.showMessageDialog(null, "Product added!");
-                        productsAdded++;
-                        userMainPanel.updateShoppingCartBtn(productsAdded);
-                        userMainPanel.getOrderedProducts(productID, nbrOfItems);
-                        updateProductList();
-                    }
-                }
-            } catch (NumberFormatException n) {
-                n.printStackTrace();
-                JOptionPane.showMessageDialog(null,"Enter a real number!");
-            }
 
         }
     }

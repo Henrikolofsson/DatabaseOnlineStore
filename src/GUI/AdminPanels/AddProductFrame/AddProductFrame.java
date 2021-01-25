@@ -2,19 +2,21 @@ package GUI.AdminPanels.AddProductFrame;
 
 import Controller.MainController;
 import Database.DatabaseController;
+import Entities.ComboBoxItem;
+import Entities.Product;
 import GUI.Usercreation.CreateAccountPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class AddProductFrame extends JFrame {
     private MainController controller;
-    private DatabaseController databaseController;
     private AddProductPanel addProductPanel;
 
-    public AddProductFrame(MainController controller, DatabaseController databaseController) {
+
+    public AddProductFrame(MainController controller) {
         this.controller = controller;
-        this.databaseController = databaseController;
         initializeComponents();
         initializeGUI();
     }
@@ -45,4 +47,13 @@ public class AddProductFrame extends JFrame {
         pack();
         setLocation(new Point(300, 100));
     }
+
+    public Product getProduct() {
+        return addProductPanel.getProduct();
+    }
+
+    public void setSuppliers(ArrayList<ComboBoxItem> suppliers) {
+        addProductPanel.setSuppliers(suppliers);
+    }
+
 }

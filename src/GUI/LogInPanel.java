@@ -1,10 +1,14 @@
 package GUI;
 
+import Controller.MainController;
+import Interfaces.PanelListener;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
 public class LogInPanel extends JPanel {
+    private PanelListener panelListener;
     private JLabel lblUsername;
     private JTextField txtUsername;
     private JLabel lblPassword;
@@ -16,8 +20,9 @@ public class LogInPanel extends JPanel {
 
     private Color GRAY_BACKGROUND_COLOR;
 
-    public LogInPanel(ApplicationMainPanel applicationMainPanel) {
+    public LogInPanel(ApplicationMainPanel applicationMainPanel, MainController controller) {
         this.applicationMainPanel = applicationMainPanel;
+        this.panelListener = controller;
         initializeComponents();
         initializeGUI();
         registerListeners();
@@ -98,30 +103,14 @@ public class LogInPanel extends JPanel {
         return txtUsername.getText();
     }
 
-    public String getPasswordLogin() {
-        char[] charPass = txtPassword.getPassword();
-        return String.valueOf(charPass);
+    public char[] getPassword() {
+        return txtPassword.getPassword();
     }
 
     private class BtnLoginListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            String userNameLogin = txtUsername.getText();
-            char[] charPass = txtPassword.getPassword();
-            String passwordLogin = String.valueOf(charPass);
-
-            if(!applicationMainPanel.isUserNormal(userNameLogin, passwordLogin) && applicationMainPanel.isUserAdmin(userNameLogin, passwordLogin)) {
-                applicationMainPanel.updateAdminView();
-                applicationMainPanel.updateAdminFirstName();
-                applicationMainPanel.setAdminViewTitle();
-            } else if(applicationMainPanel.isUserNormal(userNameLogin, passwordLogin) && !applicationMainPanel.isUserAdmin(userNameLogin, passwordLogin)){
-                applicationMainPanel.updateUserView();
-                applicationMainPanel.updateUserFirstName();
-                applicationMainPanel.setUserViewTitle();
-            } else {
-                JOptionPane.showMessageDialog(null, "Wrong login credentials!");
-            }
-
+            panelListener.btnPressed("LogIn");
         }
     }
 
@@ -129,7 +118,7 @@ public class LogInPanel extends JPanel {
 
         @Override
         public void mouseClicked(MouseEvent mouseEvent) {
-            applicationMainPanel.openCreateAccountWindow();
+            panelListener.btnPressed("OpenNewAccountWindow");
         }
 
         @Override

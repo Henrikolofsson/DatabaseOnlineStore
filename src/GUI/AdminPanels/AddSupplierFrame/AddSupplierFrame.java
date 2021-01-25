@@ -2,6 +2,7 @@ package GUI.AdminPanels.AddSupplierFrame;
 
 import Controller.MainController;
 import Database.DatabaseController;
+import Entities.Supplier;
 import GUI.Usercreation.CreateAccountPanel;
 
 import javax.swing.*;
@@ -12,9 +13,8 @@ public class AddSupplierFrame extends JFrame {
     private DatabaseController databaseController;
     private AddSupplierPanel addSupplierPanel;
 
-    public AddSupplierFrame(MainController controller, DatabaseController databaseController) {
+    public AddSupplierFrame(MainController controller) {
         this.controller = controller;
-        this.databaseController = databaseController;
         initializeComponents();
         initializeGUI();
     }
@@ -44,5 +44,9 @@ public class AddSupplierFrame extends JFrame {
 
         pack();
         setLocation(new Point(300, 100));
+    }
+
+    public Supplier getSupplier() {
+        return addSupplierPanel.getSupplier();
     }
 }

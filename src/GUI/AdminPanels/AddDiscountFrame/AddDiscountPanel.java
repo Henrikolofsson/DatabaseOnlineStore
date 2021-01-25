@@ -1,12 +1,15 @@
 package GUI.AdminPanels.AddDiscountFrame;
 
 import Controller.MainController;
+import Entities.Discount;
 import GUI.AdminPanels.AddProductFrame.AddProductPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 public class AddDiscountPanel extends JPanel {
     private MainController controller;
@@ -15,10 +18,14 @@ public class AddDiscountPanel extends JPanel {
     private JLabel lblDiscountCode;
     private JLabel lblDiscountPercentage;
     private JLabel lblDiscountReason;
+    private JLabel lblAddDiscountStart;
+    private JLabel lblAddDiscountEnd;
 
     private JTextField txtDiscountCode;
     private JTextField txtDiscountPercentage;
     private JTextField txtDiscountReason;
+    private JTextField txtAddDiscountStart;
+    private JTextField txtAddDiscountEnd;
 
     private JButton btnAddDiscount;
     private JButton btnExit;
@@ -72,6 +79,34 @@ public class AddDiscountPanel extends JPanel {
         txtDiscountReason.setForeground(Color.LIGHT_GRAY);
         txtDiscountReason.setOpaque(true);
         txtDiscountReason.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+
+        lblAddDiscountStart = new JLabel("Discount startdate:");
+        lblAddDiscountStart.setMinimumSize(new Dimension(120,20));
+        lblAddDiscountStart.setPreferredSize(new Dimension(120,20));
+        lblAddDiscountStart.setForeground(Color.LIGHT_GRAY);
+
+        txtAddDiscountStart = new JTextField();
+        txtAddDiscountStart.setSize(new Dimension(120, 20));
+        txtAddDiscountStart.setPreferredSize(new Dimension(120, 20));
+        txtAddDiscountStart.setText("YYYY-MM-DD");
+        txtAddDiscountStart.setBackground(GRAY_BACKGROUND_COLOR);
+        txtAddDiscountStart.setForeground(Color.LIGHT_GRAY);
+        txtAddDiscountStart.setOpaque(true);
+        txtAddDiscountStart.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+
+        lblAddDiscountEnd = new JLabel("Discount startdate:");
+        lblAddDiscountEnd.setMinimumSize(new Dimension(120,20));
+        lblAddDiscountEnd.setPreferredSize(new Dimension(120,20));
+        lblAddDiscountEnd.setForeground(Color.LIGHT_GRAY);
+
+        txtAddDiscountEnd = new JTextField();
+        txtAddDiscountEnd.setSize(new Dimension(120, 20));
+        txtAddDiscountEnd.setPreferredSize(new Dimension(120, 20));
+        txtAddDiscountEnd.setText("YYYY-MM-DD");
+        txtAddDiscountEnd.setBackground(GRAY_BACKGROUND_COLOR);
+        txtAddDiscountEnd.setForeground(Color.LIGHT_GRAY);
+        txtAddDiscountEnd.setOpaque(true);
+        txtAddDiscountEnd.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         btnAddDiscount = new JButton("Add discount");
         btnAddDiscount.setSize(new Dimension(150, 25));
@@ -129,11 +164,27 @@ public class AddDiscountPanel extends JPanel {
 
         gbc.gridx = 0;
         gbc.gridy = 3;
+        add(lblAddDiscountStart, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        add(txtAddDiscountStart, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        add(lblAddDiscountEnd, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        add(txtAddDiscountEnd, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
         gbc.gridwidth = 2;
         add(btnAddDiscount, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 6;
         gbc.gridwidth = 2;
         add(btnExit, gbc);
     }
@@ -143,8 +194,30 @@ public class AddDiscountPanel extends JPanel {
         btnExit.addActionListener(new BtnExitListener());
     }
 
-    private class BtnExitListener implements ActionListener {
+    public Discount getDiscount() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            //Text fields text formatted to a SimpleDateFormat
+            java.util.Date dateStart = format.parse(txtAddDiscountStart.getText());
+            java.util.Date dateEnd = format.parse(txtAddDiscountEnd.getText());
 
+            //Converted to a SQL date object, so that the database can store the object.
+            java.sql.Date sqlDateStart = new java.sql.Date(dateStart.getTime());
+            java.sql.Date sqlDateEnd = new java.sql.Date(dateEnd.getTime());
+
+            return new Discount(Integer.parseInt(txtDiscountCode.getText()),
+                    Integer.parseInt(txtDiscountPercentage.getText()),
+                    txtDiscountReason.getText(),
+                    sqlDateStart,
+                    sqlDateEnd);
+
+        } catch(ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private class BtnExitListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             addDiscountFrame.dispose();
@@ -155,14 +228,13 @@ public class AddDiscountPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int discountCode = Integer.parseInt(txtDiscountCode.getText());
-            double discountPercentageRaw = Double.parseDouble(txtDiscountPercentage.getText());
-            String discountReason = txtDiscountReason.getText();
+            if(!txtDiscountReason.getText().isEmpty() &&
+                    Integer.parseInt(txtDiscountCode.getText()) > -1 &&
+                    Integer.parseInt(txtDiscountPercentage.getText()) > -1 &&
+                    !txtAddDiscountStart.getText().isEmpty() &&
+                    !txtAddDiscountEnd.getText().isEmpty()) {
 
-            double discountPercentage = discountPercentageRaw/100;
-
-            if(!discountReason.isEmpty() && discountCode > -1 && discountPercentageRaw > -1){
-                controller.sendDiscountInformation(discountCode, discountPercentage, discountReason);
+                controller.btnPressed("AddDiscount");
             }
             else {
                 JOptionPane.showMessageDialog(null, "Enter all credentials!");

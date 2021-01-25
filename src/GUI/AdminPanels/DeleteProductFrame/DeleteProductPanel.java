@@ -1,6 +1,8 @@
 package GUI.AdminPanels.DeleteProductFrame;
 
 import Controller.MainController;
+import Entities.ComboBoxItem;
+import Entities.Product;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +15,7 @@ public class DeleteProductPanel extends JPanel{
 
     private JLabel lblProductToDelete;
 
-    private JComboBox<String> cmbBoxProducts;
+    private JComboBox<ComboBoxItem> cmbBoxProducts;
 
     private JButton btnDeleteProduct;
 
@@ -36,12 +38,11 @@ public class DeleteProductPanel extends JPanel{
         lblProductToDelete.setPreferredSize(new Dimension(200,20));
         lblProductToDelete.setForeground(Color.LIGHT_GRAY);
 
-        cmbBoxProducts = new JComboBox<>();
-        for(int i = 0; i < controller.getProducts().size(); i++){
-            cmbBoxProducts.addItem(controller.getProducts().get(i));
-        }
-        cmbBoxProducts.setMinimumSize(new Dimension(140,20));
-        cmbBoxProducts.setPreferredSize(new Dimension(140,20));
+        DefaultComboBoxModel<ComboBoxItem> model = new DefaultComboBoxModel<>(controller.getActiveProducts());
+        cmbBoxProducts = new JComboBox<>(model);
+
+        cmbBoxProducts.setMinimumSize(new Dimension(200,20));
+        cmbBoxProducts.setPreferredSize(new Dimension(200,20));
         cmbBoxProducts.setBackground(Color.decode("#2b2b2b"));
         cmbBoxProducts.setForeground(Color.LIGHT_GRAY);
         cmbBoxProducts.setOpaque(true);
@@ -97,6 +98,12 @@ public class DeleteProductPanel extends JPanel{
         btnExit.addActionListener(new BtnExitListener());
     }
 
+    //TODO: Get the correct product id to delete!!
+    public int getProduct() {
+        int index = cmbBoxProducts.getSelectedIndex();
+        return cmbBoxProducts.getItemAt(index).getItemValue();
+    }
+
     private class BtnExitListener implements ActionListener {
 
         @Override
@@ -109,12 +116,9 @@ public class DeleteProductPanel extends JPanel{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int index = cmbBoxProducts.getSelectedIndex();
-            String productNameToDelete = String.valueOf(cmbBoxProducts.getItemAt(index));
-            cmbBoxProducts.removeItemAt(index);
 
-            controller.sendToDelete(productNameToDelete);
-            controller.updateProductList();
+            controller.btnPressed("DeleteProduct");
+
         }
     }
 }

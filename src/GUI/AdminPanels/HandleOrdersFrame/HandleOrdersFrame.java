@@ -1,8 +1,7 @@
-package GUI.AdminPanels.HandleOrders;
+package GUI.AdminPanels.HandleOrdersFrame;
 
 import Controller.MainController;
 import Database.DatabaseController;
-import GUI.AdminPanels.HandleProductFrame.HandleProductPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,12 +9,10 @@ import java.util.ArrayList;
 
 public class HandleOrdersFrame extends JFrame {
     private MainController controller;
-    private DatabaseController databaseController;
     private HandleOrdersPanel handleOrdersPanel;
 
-    public HandleOrdersFrame(MainController controller, DatabaseController databaseController) {
+    public HandleOrdersFrame(MainController controller) {
         this.controller = controller;
-        this.databaseController = databaseController;
         initializeComponents();
         initializeGUI();
     }
@@ -48,6 +45,8 @@ public class HandleOrdersFrame extends JFrame {
     }
 
     public ArrayList<String> getOrdersList() {
-        return controller.getOrdersList();
+        //return controller.getOrdersList();
+        ArrayList<String> arr = new ArrayList<>();
+        return arr;
     }
 }

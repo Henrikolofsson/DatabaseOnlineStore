@@ -2,6 +2,7 @@ package GUI.AdminPanels.AddDiscountFrame;
 
 import Controller.MainController;
 import Database.DatabaseController;
+import Entities.Discount;
 import GUI.AdminPanels.AddProductFrame.AddProductPanel;
 
 import javax.swing.*;
@@ -9,12 +10,10 @@ import java.awt.*;
 
 public class AddDiscountFrame extends JFrame {
     private MainController controller;
-    private DatabaseController databaseController;
     private AddDiscountPanel addDiscountPanel;
 
-    public AddDiscountFrame(MainController controller, DatabaseController databaseController) {
+    public AddDiscountFrame(MainController controller) {
         this.controller = controller;
-        this.databaseController = databaseController;
         initializeComponents();
         initializeGUI();
     }
@@ -44,5 +43,9 @@ public class AddDiscountFrame extends JFrame {
 
         pack();
         setLocation(new Point(300, 100));
+    }
+
+    public Discount getDiscount() {
+        return addDiscountPanel.getDiscount();
     }
 }

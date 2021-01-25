@@ -2,17 +2,22 @@ package Entities;
 
 import Database.DatabaseController;
 
+import java.sql.Date;
+
+
 public class Discount {
     private int discountCode;
-    private double discountPercentage;
+    private int discountPercentage;
     private String discountReason;
-    private DatabaseController databaseController;
+    private Date discountStart;
+    private Date discountEnd;
 
-    public Discount(int discountCode, double discountPercentage, String discountReason, DatabaseController databaseController) {
+    public Discount(int discountCode, int discountPercentage, String discountReason, Date discountStart, Date discountEnd) {
         this.discountCode = discountCode;
         this.discountPercentage = discountPercentage;
         this.discountReason = discountReason;
-        this.databaseController = databaseController;
+        this.discountStart = discountStart;
+        this.discountEnd = discountEnd;
     }
 
     public int getDiscountCode() {
@@ -23,11 +28,11 @@ public class Discount {
         this.discountCode = discountCode;
     }
 
-    public double getDiscountPercentage() {
+    public int getDiscountPercentage() {
         return discountPercentage;
     }
 
-    public void setDiscountPercentage(double discountPercentage) {
+    public void setDiscountPercentage(int discountPercentage) {
         this.discountPercentage = discountPercentage;
     }
 
@@ -39,7 +44,30 @@ public class Discount {
         this.discountReason = discountReason;
     }
 
-    public void addDiscount(){
-        databaseController.addDiscount(this);
+    public Date getDiscountStart() {
+        return discountStart;
+    }
+
+    public void setDiscountStart(Date discountStart) {
+        this.discountStart = discountStart;
+    }
+
+    public Date getDiscountEnd() {
+        return discountEnd;
+    }
+
+    public void setDiscountEnd(Date discountEnd) {
+        this.discountEnd = discountEnd;
+    }
+
+    @Override
+    public String toString() {
+        return "Discount{" +
+                "discountCode=" + discountCode +
+                ", discountPercentage=" + discountPercentage +
+                ", discountReason='" + discountReason + '\'' +
+                ", discountStart='" + discountStart + '\'' +
+                ", discountEnd='" + discountEnd + '\'' +
+                '}';
     }
 }

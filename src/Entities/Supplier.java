@@ -6,14 +6,16 @@ public class Supplier {
     private String supplierName;
     private String supplierPhone;
     private String supplierAddress;
-    private DatabaseController databaseController;
+    private String supplierCity;
+    private String supplierCountry;
 
 
-    public Supplier(String supplierName, String supplierAddress, String supplierPhone, DatabaseController databaseController){
+    public Supplier(String supplierName, String supplierPhone, String supplierAddress, String supplierCity, String supplierCountry) {
         this.supplierName = supplierName;
         this.supplierAddress = supplierAddress;
         this.supplierPhone = supplierPhone;
-        this.databaseController = databaseController;
+        this.supplierCity = supplierCity;
+        this.supplierCountry = supplierCountry;
     }
 
     public String getSupplierName() {
@@ -40,7 +42,30 @@ public class Supplier {
         this.supplierAddress = supplierAddress;
     }
 
-    public void addSupplier() {
-        databaseController.addSupplier(this);
+    public String getSupplierCity() {
+        return supplierCity;
+    }
+
+    public void setSupplierCity(String supplierCity) {
+        this.supplierCity = supplierCity;
+    }
+
+    public String getSupplierCountry() {
+        return supplierCountry;
+    }
+
+    public void setSupplierCountry(String supplierCountry) {
+        this.supplierCountry = supplierCountry;
+    }
+
+    @Override
+    public String toString() {
+        return "Supplier{" +
+                "supplierName='" + supplierName + '\'' +
+                ", supplierPhone='" + supplierPhone + '\'' +
+                ", supplierAddress='" + supplierAddress + '\'' +
+                ", supplierCity='" + supplierCity + '\'' +
+                ", supplierCountry='" + supplierCountry + '\'' +
+                '}';
     }
 }

@@ -1,6 +1,7 @@
 package GUI.AdminPanels.HandleProductFrame;
 
 import Controller.MainController;
+import Entities.ComboBoxItem;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HandleProductPanel extends JPanel {
     private MainController controller;
@@ -16,19 +19,12 @@ public class HandleProductPanel extends JPanel {
     private JLabel lblProductToEdit;
 
     private JLabel lblNewQuantity;
-    private JLabel lblAddDiscountStart;
-    private JLabel lblAddDiscountEnd;
-    private JLabel lblUnusedDiscounts;
 
     private JTextField txtNewQuantity;
-    private JTextField txtAddDiscountStart;
-    private JTextField txtAddDiscountEnd;
 
-    private JComboBox<String> cmbBoxProducts;
-    private JComboBox<String> cmbBoxUnusedDiscounts;
+    private JComboBox<ComboBoxItem> cmbBoxProducts;
 
     private JButton btnEditQuantity;
-    private JButton btnAddUnusedDiscount;
     private JButton btnExit;
 
     private Color GRAY_BACKGROUND_COLOR;
@@ -48,61 +44,20 @@ public class HandleProductPanel extends JPanel {
         lblProductToEdit.setPreferredSize(new Dimension(140,20));
         lblProductToEdit.setForeground(Color.LIGHT_GRAY);
 
-        cmbBoxProducts = new JComboBox<>();
-        for(int i = 0; i < controller.getProducts().size(); i++){
-            cmbBoxProducts.addItem(controller.getProducts().get(i));
-        }
+        DefaultComboBoxModel<ComboBoxItem> model = new DefaultComboBoxModel<>(controller.getActiveProducts());
+        cmbBoxProducts = new JComboBox<>(model);
+
+        cmbBoxProducts.setMinimumSize(new Dimension(200,20));
+        cmbBoxProducts.setPreferredSize(new Dimension(200,20));
         cmbBoxProducts.setBackground(Color.decode("#2b2b2b"));
         cmbBoxProducts.setForeground(Color.LIGHT_GRAY);
         cmbBoxProducts.setOpaque(true);
         cmbBoxProducts.setFont(new Font("Helvetica", Font.BOLD, 12));
 
-        lblNewQuantity = new JLabel("New Quantity: ");
+        lblNewQuantity = new JLabel("Add Quantity: ");
         lblNewQuantity.setMinimumSize(new Dimension(120,20));
         lblNewQuantity.setPreferredSize(new Dimension(120,20));
         lblNewQuantity.setForeground(Color.LIGHT_GRAY);
-
-        lblUnusedDiscounts = new JLabel("Discounts:");
-        lblUnusedDiscounts.setMinimumSize(new Dimension(120,20));
-        lblUnusedDiscounts.setPreferredSize(new Dimension(120,20));
-        lblUnusedDiscounts.setForeground(Color.LIGHT_GRAY);
-
-        cmbBoxUnusedDiscounts = new JComboBox<>();
-        for(int i = 0; i < controller.getDiscounts().size(); i++){
-            cmbBoxUnusedDiscounts.addItem(controller.getDiscounts().get(i));
-        }
-        cmbBoxUnusedDiscounts.setBackground(Color.decode("#2b2b2b"));
-        cmbBoxUnusedDiscounts.setForeground(Color.LIGHT_GRAY);
-        cmbBoxUnusedDiscounts.setOpaque(true);
-        cmbBoxUnusedDiscounts.setFont(new Font("Helvetica", Font.BOLD, 12));
-
-        lblAddDiscountStart = new JLabel("Discount startdate:");
-        lblAddDiscountStart.setMinimumSize(new Dimension(120,20));
-        lblAddDiscountStart.setPreferredSize(new Dimension(120,20));
-        lblAddDiscountStart.setForeground(Color.LIGHT_GRAY);
-
-        lblAddDiscountEnd = new JLabel("Discount startdate:");
-        lblAddDiscountEnd.setMinimumSize(new Dimension(120,20));
-        lblAddDiscountEnd.setPreferredSize(new Dimension(120,20));
-        lblAddDiscountEnd.setForeground(Color.LIGHT_GRAY);
-
-        txtAddDiscountStart = new JTextField();
-        txtAddDiscountStart.setSize(new Dimension(100, 20));
-        txtAddDiscountStart.setPreferredSize(new Dimension(100, 20));
-        txtAddDiscountStart.setText("YYYY-MM-DD");
-        txtAddDiscountStart.setBackground(GRAY_BACKGROUND_COLOR);
-        txtAddDiscountStart.setForeground(Color.LIGHT_GRAY);
-        txtAddDiscountStart.setOpaque(true);
-        txtAddDiscountStart.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-
-        txtAddDiscountEnd = new JTextField();
-        txtAddDiscountEnd.setSize(new Dimension(100, 20));
-        txtAddDiscountEnd.setPreferredSize(new Dimension(100, 20));
-        txtAddDiscountEnd.setText("YYYY-MM-DD");
-        txtAddDiscountEnd.setBackground(GRAY_BACKGROUND_COLOR);
-        txtAddDiscountEnd.setForeground(Color.LIGHT_GRAY);
-        txtAddDiscountEnd.setOpaque(true);
-        txtAddDiscountEnd.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         txtNewQuantity = new JTextField();
         txtNewQuantity.setSize(new Dimension(50, 20));
@@ -119,14 +74,6 @@ public class HandleProductPanel extends JPanel {
         btnEditQuantity.setOpaque(true);
         btnEditQuantity.setBorderPainted(false);
         btnEditQuantity.setBackground(Color.decode("#518A3D"));
-
-        btnAddUnusedDiscount = new JButton("Add discount period");
-        btnAddUnusedDiscount.setSize(new Dimension(200, 25));
-        btnAddUnusedDiscount.setPreferredSize(new Dimension(200, 25));
-        btnAddUnusedDiscount.setFont(new Font("Helvetica", Font.PLAIN, 12));
-        btnAddUnusedDiscount.setOpaque(true);
-        btnAddUnusedDiscount.setBorderPainted(false);
-        btnAddUnusedDiscount.setBackground(Color.decode("#518A3D"));
 
         btnExit = new JButton("Exit");
         btnExit.setSize(new Dimension(100, 25));
@@ -174,36 +121,6 @@ public class HandleProductPanel extends JPanel {
         add(btnEditQuantity, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.gridwidth = 1;
-        add(lblUnusedDiscounts, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        add(cmbBoxUnusedDiscounts, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        add(lblAddDiscountStart, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 5;
-        add(txtAddDiscountStart, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 6;
-        add(lblAddDiscountEnd, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 6;
-        add(txtAddDiscountEnd, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 7;
-        gbc.gridwidth = 2;
-        add(btnAddUnusedDiscount, gbc);
-
-        gbc.gridx = 0;
         gbc.gridy = 8;
         gbc.gridwidth = 2;
         add(btnExit, gbc);
@@ -211,118 +128,32 @@ public class HandleProductPanel extends JPanel {
 
     private void registerListeners() {
         btnEditQuantity.addActionListener(new BtnEditQuantityListener());
-        btnAddUnusedDiscount.addActionListener(new BtnAddUnusedDiscountPeriodListener());
         btnExit.addActionListener(new BtnExitListener());
-        txtAddDiscountStart.addMouseListener(new TxtStartDateListener());
-        txtAddDiscountEnd.addMouseListener(new TxtEndDateListener());
     }
 
-    private class TxtStartDateListener implements MouseListener {
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            txtAddDiscountStart.setText("");
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-            if(txtAddDiscountStart.getText().isEmpty()){
-                txtAddDiscountStart.setText("YYYY-MM-DD");
-            }
-        }
-    }
-
-    private class TxtEndDateListener implements MouseListener {
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            txtAddDiscountEnd.setText("");
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-            if(txtAddDiscountEnd.getText().isEmpty()){
-                txtAddDiscountEnd.setText("YYYY-MM-DD");
-            }
-
-        }
+    public Map<String, Integer> getIdAndQuantity() {
+        int index = cmbBoxProducts.getSelectedIndex();
+        Map<String, Integer> map = new HashMap<>(2);
+        map.put("product_id", cmbBoxProducts.getItemAt(index).getItemValue());
+        map.put("quantity", Integer.parseInt(txtNewQuantity.getText()));
+        return map;
     }
 
     private class BtnEditQuantityListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String strNewQuantity = txtNewQuantity.getText();
-            int newQuantity = 0;
-            int index = cmbBoxProducts.getSelectedIndex();
-            String productNameToUpdate = String.valueOf(cmbBoxProducts.getItemAt(index));
-
-            boolean isParsable;
-            try {
-                newQuantity = Integer.parseInt(strNewQuantity);
-                isParsable = true;
-            } catch (NumberFormatException n){
-                JOptionPane.showMessageDialog(null, "Enter a number!");
-                n.printStackTrace();
-                isParsable = false;
-            }
-            if(isParsable){
-                controller.sendToUpdateQuantity(newQuantity, productNameToUpdate);
-            }
+            controller.btnPressed("AddQuantity");
         }
     }
 
-    private class BtnAddUnusedDiscountPeriodListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String startDate = txtAddDiscountStart.getText();
-            String endDate = txtAddDiscountEnd.getText();
-            int index = cmbBoxProducts.getSelectedIndex();
-            String productNameToUpdate = String.valueOf(cmbBoxProducts.getItemAt(index));
-
-            int indexDiscount = cmbBoxUnusedDiscounts.getSelectedIndex();
-            String discountToSetDate = String.valueOf(cmbBoxUnusedDiscounts.getItemAt(indexDiscount));
-
-            controller.sendToAddDiscountPeriod(startDate, endDate, productNameToUpdate, discountToSetDate);
-        }
-    }
 
     private class BtnExitListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            handleProductFrame.dispose();
+
         }
+
     }
 }
 

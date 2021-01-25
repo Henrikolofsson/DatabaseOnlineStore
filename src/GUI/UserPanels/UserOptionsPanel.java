@@ -59,7 +59,7 @@ public class UserOptionsPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            userMainPanel.openShoppingCart();
+            //userMainPanel.openShoppingCart();
         }
     }
 }

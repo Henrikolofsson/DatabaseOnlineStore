@@ -23,7 +23,7 @@ public class StorePanel extends JPanel {
     private JButton btnSearch;
     private JButton btnUpdate;
 
-    public StorePanel(ApplicationMainPanel applicationMainPanel) {
+    public StorePanel(ApplicationMainPanel applicationMainPanel, MainController controller) {
         this.applicationMainPanel = applicationMainPanel;
         initializeComponents();
         updateProductList();

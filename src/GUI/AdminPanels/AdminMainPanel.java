@@ -1,27 +1,31 @@
 package GUI.AdminPanels;
 
+import Controller.MainController;
 import Entities.Admin;
+import Entities.Supplier;
 import GUI.ApplicationMainPanel;
+import Interfaces.PanelListener;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
 public class AdminMainPanel extends JPanel {
+    private PanelListener panelListener;
     private ApplicationMainPanel applicationMainPanel;
     private OptionsPanel optionsPanel;
     private AdminStorePanel adminStorePanel;
 
-    public AdminMainPanel(ApplicationMainPanel applicationMainPanel){
+    public AdminMainPanel(ApplicationMainPanel applicationMainPanel, MainController controller){
         this.applicationMainPanel = applicationMainPanel;
-
+        this.panelListener = controller;
         initializeComponents();
         initializeGUI();
     }
 
     private void initializeComponents(){
-        this.optionsPanel = new OptionsPanel(this);
-        this.adminStorePanel = new AdminStorePanel(this);
+        this.optionsPanel = new OptionsPanel((MainController) panelListener,this);
+        this.adminStorePanel = new AdminStorePanel(panelListener,this);
     }
 
     private void initializeGUI(){
@@ -41,57 +45,19 @@ public class AdminMainPanel extends JPanel {
         add(adminStorePanel, gbc);
     }
 
-    public void openAddSupplierFrame() {
-        applicationMainPanel.openAddSupplierFrame();
-    }
-
-    public void openAddProductFrame() {
-        applicationMainPanel.openAddProductFrame();
-    }
-
-    public void openAddDiscountFrame() {
-        applicationMainPanel.openAddDiscountFrame();
-    }
-
-    public void openDeleteProductFrame() {
-        applicationMainPanel.openDeleteProductFrame();
-    }
 
     public ArrayList<String> getAllProducts(){
         return applicationMainPanel.getAllProducts();
     }
 
-    public void updateProductList() {
-        adminStorePanel.updateProductList();
-    }
 
     public ArrayList<String> getSearchedProducts(String searchedCode, String searchedSupplier, String searchedProduct) {
         return applicationMainPanel.getSearchedProducts(searchedCode, searchedSupplier, searchedProduct);
     }
 
-    public void openHandleProductFrame() {
-        applicationMainPanel.openHandleProductFrame();
+
+    public void updateFirstName(String name) {
+        adminStorePanel.updateFirstname(name);
     }
 
-    public String getFirstname() {
-        String usernameLogin = applicationMainPanel.getUsernameLogin();
-        String usernamePassword = applicationMainPanel.getPasswordLogin();
-        return applicationMainPanel.getFirstname(usernameLogin, usernamePassword);
-    }
-
-    public void updateFirstName() {
-        adminStorePanel.updateFirstname();
-    }
-
-    public void openViewUsedDiscountsFrame() {
-        applicationMainPanel.openViewUsedDiscountsFrame();
-    }
-
-    public void updateUsedDiscounts() {
-        applicationMainPanel.updateUsedDiscounts();
-    }
-
-    public void openHandleOrdersFrame() {
-        applicationMainPanel.openHandleOrdersFrame();
-    }
 }

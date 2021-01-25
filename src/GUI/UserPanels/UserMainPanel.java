@@ -1,5 +1,6 @@
 package GUI.UserPanels;
 
+import Controller.MainController;
 import GUI.ApplicationMainPanel;
 import GUI.UserPanels.ShoppingCartFrame.ShoppingCartPanel;
 
@@ -9,11 +10,13 @@ import java.util.ArrayList;
 
 public class UserMainPanel extends JPanel {
     private ApplicationMainPanel applicationMainPanel;
+    private MainController controller;
     private UserOptionsPanel optionsPanel;
     private UserStorePanel userStorePanel;
 
-    public UserMainPanel(ApplicationMainPanel applicationMainPanel){
+    public UserMainPanel(ApplicationMainPanel applicationMainPanel, MainController controller){
         this.applicationMainPanel = applicationMainPanel;
+        this.controller = controller;
 
         initializeComponents();
         initializeGUI();
@@ -21,7 +24,7 @@ public class UserMainPanel extends JPanel {
 
     private void initializeComponents(){
         this.optionsPanel = new UserOptionsPanel(this);
-        this.userStorePanel = new UserStorePanel(this);
+        this.userStorePanel = new UserStorePanel(this, controller);
     }
 
     private void initializeGUI(){
@@ -49,19 +52,10 @@ public class UserMainPanel extends JPanel {
         return applicationMainPanel.getSearchedProducts(searchedCode, searchedSupplier, searchedProduct);
     }
 
-    public String getFirstname() {
-        String usernameLogin = applicationMainPanel.getUsernameLogin();
-        String usernamePassword = applicationMainPanel.getPasswordLogin();
-        return applicationMainPanel.getFirstname(usernameLogin, usernamePassword);
+    public void updateFirstname(String userName) {
+        userStorePanel.updateFirstname(userName);
     }
 
-    public void updateFirstname() {
-        userStorePanel.updateFirstname();
-    }
-
-    public boolean checkQuantity(int nbrOfItems, int productID) {
-        return applicationMainPanel.checkQuantity(nbrOfItems, productID);
-    }
 
     public void updateShoppingCartBtn(int productsAdded) {
         optionsPanel.updateShoppingCartBtn(productsAdded);
@@ -71,9 +65,6 @@ public class UserMainPanel extends JPanel {
 
     }
 
-    public void openShoppingCart() {
-        applicationMainPanel.openShoppingcart();
-    }
 
     public ArrayList<String> getProductsForCustomers() {
         return applicationMainPanel.getProductsForCustomers();

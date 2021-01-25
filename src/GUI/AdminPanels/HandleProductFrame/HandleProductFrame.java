@@ -6,15 +6,15 @@ import GUI.AdminPanels.DeleteProductFrame.DeleteProductPanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Map;
 
 public class HandleProductFrame extends JFrame {
     private MainController controller;
-    private DatabaseController databaseController;
     private HandleProductPanel handleProductPanel;
 
-    public HandleProductFrame(MainController controller, DatabaseController databaseController) {
+
+    public HandleProductFrame(MainController controller) {
         this.controller = controller;
-        this.databaseController = databaseController;
         initializeComponents();
         initializeGUI();
     }
@@ -44,5 +44,9 @@ public class HandleProductFrame extends JFrame {
 
         pack();
         setLocation(new Point(300, 100));
+    }
+
+    public Map<String, Integer> getIdAndQuantity() {
+        return handleProductPanel.getIdAndQuantity();
     }
 }

@@ -1,13 +1,11 @@
-package GUI.AdminPanels.HandleOrders;
+package GUI.AdminPanels.HandleOrdersFrame;
 
 import Controller.MainController;
-import GUI.AdminPanels.HandleProductFrame.HandleProductFrame;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class HandleOrdersPanel extends JPanel {
     private MainController controller;

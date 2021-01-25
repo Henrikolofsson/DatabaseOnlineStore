@@ -6,15 +6,14 @@ public class Product {
     private String productName;
     private int productQuantity;
     private int productPrice;
-    private String productSupplier;
-    private DatabaseController databaseController;
+    private int productSupplier;
+    private String productStatus;
 
-    public Product(String productName, int productQuantity, int productPrice, String productSupplier, DatabaseController databaseController) {
+    public Product(String productName, int productQuantity, int productPrice, int productSupplier) {
         this.productName = productName;
         this.productQuantity = productQuantity;
         this.productPrice = productPrice;
         this.productSupplier = productSupplier;
-        this.databaseController = databaseController;
     }
 
     public String getProductName() {
@@ -41,15 +40,29 @@ public class Product {
         this.productPrice = productPrice;
     }
 
-    public String getProductSupplier() {
+    public int getProductSupplier() {
         return productSupplier;
     }
 
-    public void setProductSupplier(String productSupplier) {
+    public void setProductSupplier(int productSupplier) {
         this.productSupplier = productSupplier;
     }
 
-    public void addProduct(){
-        databaseController.addProduct(this);
+    public String getProductStatus() {
+        return productStatus;
+    }
+
+    public void setProductStatus(String productStatus) {
+        this.productStatus = productStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productName='" + productName + '\'' +
+                ", productQuantity=" + productQuantity +
+                ", productPrice=" + productPrice +
+                ", productSupplier='" + productSupplier + '\'' +
+                '}';
     }
 }

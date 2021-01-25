@@ -2,18 +2,17 @@ package GUI;
 
 import Controller.MainController;
 import Database.DatabaseController;
+import Entities.Supplier;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class ApplicationFrame extends JFrame {
     private MainController controller;
-    private DatabaseController databaseController;
     private ApplicationMainPanel mainPanel;
 
-    public ApplicationFrame(MainController controller, DatabaseController databaseController) {
+    public ApplicationFrame(MainController controller) {
         this.controller = controller;
-        this.databaseController = databaseController;
         initializeComponents();
         initializeGUI();
     }
@@ -52,4 +51,29 @@ public class ApplicationFrame extends JFrame {
     public void setUserViewTitle(){
         setTitle("User View");
     }
+
+    public String getUserName() {
+        return mainPanel.getUsernameLogin();
+    }
+
+    public char[] getPassword() {
+        return mainPanel.getPasswordLogin();
+    }
+
+    public void updateAdminView() {
+        mainPanel.updateAdminView();
+    }
+
+    public void updateAdminFirstName(String name) {
+        mainPanel.updateAdminFirstName(name);
+    }
+
+    public void updateUserView() {
+        mainPanel.updateUserView();
+    }
+
+    public void updateUserFirstName(String name) {
+        mainPanel.updateUserFirstName(name);
+    }
+
 }

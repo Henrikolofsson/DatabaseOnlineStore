@@ -1,6 +1,7 @@
 package GUI.AdminPanels;
 
 import Controller.MainController;
+import Interfaces.PanelListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +22,7 @@ public class AdminStorePanel extends JPanel {
     private JButton btnUpdate;
 
 
-    public AdminStorePanel(AdminMainPanel adminMainPanel){
+    public AdminStorePanel(PanelListener panelListener, AdminMainPanel adminMainPanel){
         this.adminMainPanel = adminMainPanel;
 
         initializeComponents();
@@ -110,8 +111,8 @@ public class AdminStorePanel extends JPanel {
         add(btnUpdate, gbc);
     }
 
-    public void updateFirstname(){
-        lblWelcome.setText("Welcome, " + adminMainPanel.getFirstname() + "!");
+    public void updateFirstname(String name){
+        lblWelcome.setText("Welcome, " + name + "!");
     }
 
     public void updateProductList(){

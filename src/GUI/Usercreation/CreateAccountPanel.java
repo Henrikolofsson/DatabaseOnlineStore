@@ -266,15 +266,14 @@ public class CreateAccountPanel extends JPanel {
                 char[] adminPw = txtAdminPw.getPassword();
                 String adminPassword = getPassword(adminPw);
 
-                System.out.println("THE PW IS YOU FAGGOT: " + adminPassword);
 
                 if(!firstName.isEmpty() && !lastName.isEmpty() && !address.isEmpty() && !city.isEmpty() && !stringPassword.isEmpty()) {
                     //Everything OK
-                    if(databaseController.checkIfAlreadyExists(userName)){
+                    if(!databaseController.checkIfAlreadyExists(userName)){
 
                         if(!adminPassword.isEmpty()) {
                             //User is creating an admin account
-                            User admin = new User(userName, firstName, stringPassword, lastName, email, address, city, country, phone);
+                            User admin = new User(userName,  stringPassword, firstName, lastName, email, address, city, country, phone);
                             if(controller.createAdminUser(admin, adminPassword)) {
                                 JOptionPane.showMessageDialog(null, "Admin created!");
                             } else {
@@ -283,7 +282,7 @@ public class CreateAccountPanel extends JPanel {
 
                         } else {
                             //User is creating regular account
-                            User regularUser = new User(userName, firstName, stringPassword, lastName, email, address, city, country, phone);
+                            User regularUser = new User(userName, stringPassword, firstName, lastName, email, address, city, country, phone);
                             if(controller.createNormalUser(regularUser)) {
                                 JOptionPane.showMessageDialog(null, "User created!");
                             } else {

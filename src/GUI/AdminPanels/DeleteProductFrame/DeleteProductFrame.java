@@ -2,6 +2,7 @@ package GUI.AdminPanels.DeleteProductFrame;
 
 import Controller.MainController;
 import Database.DatabaseController;
+import Entities.Product;
 import GUI.AdminPanels.AddProductFrame.AddProductPanel;
 
 import javax.swing.*;
@@ -9,12 +10,11 @@ import java.awt.*;
 
 public class DeleteProductFrame extends JFrame {
     private MainController controller;
-    private DatabaseController databaseController;
     private DeleteProductPanel deleteProductPanel;
 
-    public DeleteProductFrame(MainController controller, DatabaseController databaseController) {
+
+    public DeleteProductFrame(MainController controller) {
         this.controller = controller;
-        this.databaseController = databaseController;
         initializeComponents();
         initializeGUI();
     }
@@ -44,6 +44,10 @@ public class DeleteProductFrame extends JFrame {
 
         pack();
         setLocation(new Point(300, 100));
+    }
+
+    public int getProduct() {
+        return deleteProductPanel.getProduct();
     }
 }
 

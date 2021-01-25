@@ -1,14 +1,13 @@
 package GUI.AdminPanels.AddSupplierFrame;
 
 import Controller.MainController;
-import Database.DatabaseController;
+import Entities.Supplier;
 import Enums.Countries;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.regex.Pattern;
 
 public class AddSupplierPanel extends JPanel{
     private MainController controller;
@@ -192,6 +191,14 @@ public class AddSupplierPanel extends JPanel{
         btnExit.addActionListener(new BtnExitListener());
     }
 
+    public Supplier getSupplier() {
+        return new Supplier(txtSupplierName.getText(),
+                txtSupplierPhone.getText(),
+                txtSupplierAddress.getText(),
+                txtSupplierCity.getText(),
+                String.valueOf(cmbBoxCountries.getSelectedItem()));
+    }
+
     private class BtnExitListener implements ActionListener {
 
         @Override
@@ -204,17 +211,13 @@ public class AddSupplierPanel extends JPanel{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String supplierName = txtSupplierName.getText();
-            String supplierPhone = txtSupplierPhone.getText();
-            String supplierAddressLine = txtSupplierAddress.getText();
-            String supplierCity = txtSupplierCity.getText();
-            int countryIndex = cmbBoxCountries.getSelectedIndex();
-            String supplierCountry = String.valueOf(cmbBoxCountries.getItemAt(countryIndex));
+            if(!txtSupplierName.getText().isEmpty() &&
+               !txtSupplierPhone.getText().isEmpty() &&
+               !txtSupplierAddress.getText().isEmpty() &&
+               !txtSupplierCity.getText().isEmpty()) {
 
-            String supplierAddress = supplierAddressLine + ", " + supplierCity + ", " + supplierCountry;
-
-            if(!supplierName.isEmpty() && !supplierPhone.isEmpty() && !supplierAddressLine.isEmpty() &&!supplierCity.isEmpty()){
-                controller.sendSupplierCredentials(supplierName, supplierAddress, supplierPhone);
+                controller.btnPressed("AddSupplier");
+                //TODO: Check so that it is actually added and display it to user
             }
             else {
                 JOptionPane.showMessageDialog(null, "Enter all credentials!");

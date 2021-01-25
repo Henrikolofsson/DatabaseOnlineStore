@@ -1,5 +1,9 @@
 package GUI.AdminPanels;
 
+import Controller.MainController;
+import Entities.Supplier;
+import Interfaces.PanelListener;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,13 +12,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class OptionsPanel extends JPanel {
+    private PanelListener panelListener;
     private AdminMainPanel adminMainPanel;
 
     private String[] options;
     private JComboBox<String> cmbBoxOptions;
     private JButton btnGo;
 
-    public OptionsPanel(AdminMainPanel adminMainPanel){
+    public OptionsPanel(MainController controller, AdminMainPanel adminMainPanel){
+        this.panelListener = controller;
         this.adminMainPanel = adminMainPanel;
 
         initializeComponents();
@@ -67,30 +73,25 @@ public class OptionsPanel extends JPanel {
         btnGo.addActionListener(new BtnGoListener());
     }
 
+
     private class BtnGoListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if(cmbBoxOptions.getSelectedIndex() == 0){
-                adminMainPanel.openAddSupplierFrame();
-            }
-            if(cmbBoxOptions.getSelectedIndex() == 1){
-                adminMainPanel.openAddDiscountFrame();
-            }
-            if(cmbBoxOptions.getSelectedIndex() == 2){
-                adminMainPanel.openAddProductFrame();
-            }
-            if(cmbBoxOptions.getSelectedIndex() == 3){
-                adminMainPanel.openDeleteProductFrame();
-            }
-            if(cmbBoxOptions.getSelectedIndex() == 4){
-                adminMainPanel.openHandleProductFrame();
-            }
-            if(cmbBoxOptions.getSelectedIndex() == 5){
-                adminMainPanel.openHandleOrdersFrame();
-            }
-            if(cmbBoxOptions.getSelectedIndex() == 6){
-                adminMainPanel.openViewUsedDiscountsFrame();
+                panelListener.btnPressed("OpenAddSupplierWindow");
+            } else if(cmbBoxOptions.getSelectedIndex() == 1){
+                panelListener.btnPressed("OpenAddDiscountWindow");
+            } else if(cmbBoxOptions.getSelectedIndex() == 2){
+                panelListener.btnPressed("OpenAddProductWindow");
+            } else if(cmbBoxOptions.getSelectedIndex() == 3){
+                panelListener.btnPressed("OpenDeleteProductWindow");
+            } else if(cmbBoxOptions.getSelectedIndex() == 4){
+                panelListener.btnPressed("OpenHandleProductWindow");
+            } else if(cmbBoxOptions.getSelectedIndex() == 5){
+                panelListener.btnPressed("OpenHandleOrdersWindow");
+            } else {
+                panelListener.btnPressed("OpenViewUsedDiscountsWindow");
             }
         }
     }

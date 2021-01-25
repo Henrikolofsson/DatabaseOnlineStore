@@ -1,11 +1,16 @@
 package GUI.AdminPanels.AddProductFrame;
 
 import Controller.MainController;
+import Entities.ComboBoxItem;
+import Entities.Product;
+import Entities.Supplier;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Vector;
 
 public class AddProductPanel extends JPanel{
     private MainController controller;
@@ -20,7 +25,8 @@ public class AddProductPanel extends JPanel{
     private JTextField txtProductName;
     private JTextField txtProductQuantity;
     private JTextField txtProductBasePrice;
-    private JComboBox<String> cmbBoxSupplier;
+    private JComboBox<ComboBoxItem> cmbBoxSupplier;
+    private ArrayList<ComboBoxItem> suppliers;
 
     private JButton btnAddProduct;
     private JButton btnExit;
@@ -33,6 +39,7 @@ public class AddProductPanel extends JPanel{
         initializeComponents();
         initializeGUI();
         registerListeners();
+
     }
 
     private void initializeComponents() {
@@ -80,10 +87,9 @@ public class AddProductPanel extends JPanel{
         lblProductSupplier.setPreferredSize(new Dimension(120,20));
         lblProductSupplier.setForeground(Color.LIGHT_GRAY);
 
-        cmbBoxSupplier = new JComboBox<>();
-        for(int i = 0; i < controller.getSuppliers().size(); i++){
-            cmbBoxSupplier.addItem(controller.getSuppliers().get(i));
-        }
+        DefaultComboBoxModel<ComboBoxItem> model = new DefaultComboBoxModel<>(controller.getSuppliersForAddProductPanel());
+        cmbBoxSupplier = new JComboBox<>(model);
+
         cmbBoxSupplier.setMinimumSize(new Dimension(120,20));
         cmbBoxSupplier.setPreferredSize(new Dimension(120,20));
         cmbBoxSupplier.setBackground(Color.decode("#2b2b2b"));
@@ -172,6 +178,19 @@ public class AddProductPanel extends JPanel{
         btnExit.addActionListener(new BtnExitListener());
     }
 
+    public Product getProduct() {
+        int supplierIndex = cmbBoxSupplier.getSelectedIndex();
+
+        return new Product(txtProductName.getText(),
+                Integer.parseInt(txtProductQuantity.getText()),
+                Integer.parseInt(txtProductBasePrice.getText()),
+                cmbBoxSupplier.getItemAt(cmbBoxSupplier.getSelectedIndex()).getItemValue());
+    }
+
+    public void setSuppliers(ArrayList<ComboBoxItem> suppliers) {
+        this.suppliers = suppliers;
+    }
+
     private class BtnExitListener implements ActionListener {
 
         @Override
@@ -184,18 +203,9 @@ public class AddProductPanel extends JPanel{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String productName = txtProductName.getText();
-            int productQuantity = Integer.parseInt(txtProductQuantity.getText());
-            int productPrice = Integer.parseInt(txtProductBasePrice.getText());
-            int indexSupplier = cmbBoxSupplier.getSelectedIndex();
-            String productSupplier = String.valueOf(cmbBoxSupplier.getItemAt(indexSupplier));
-
-
-            if(!productName.isEmpty() && productQuantity > -1 && productPrice > -1){
-                controller.sendProductInformation(productName, productQuantity, productPrice, productSupplier);
-                controller.updateProductList();
-            }
-            else {
+            if(!txtProductName.getText().isEmpty() && Integer.parseInt(txtProductQuantity.getText()) > -1 && Integer.parseInt(txtProductBasePrice.getText()) > -1) {
+                controller.btnPressed("AddProduct");
+            } else {
                 JOptionPane.showMessageDialog(null, "Enter all credentials!");
             }
         }

@@ -32,9 +32,9 @@ public class ViewUsedDiscountsPanel extends JPanel {
         defaultListModel = new DefaultListModel<>();
 
         listUsedDiscounts = new JList<>(defaultListModel);
-        for(int i = 0; i < controller.getUsedDiscounts().size(); i++){
+       /* for(int i = 0; i < controller.getUsedDiscounts().size(); i++){
             defaultListModel.addElement(controller.getUsedDiscounts().get(i));
-        }
+        }*/
         if(defaultListModel.isEmpty()){
             defaultListModel.addElement("No previous discounts");
         }
@@ -83,9 +83,9 @@ public class ViewUsedDiscountsPanel extends JPanel {
 
     public void updateUsedDiscountList(){
         defaultListModel.removeAllElements();
-        for(int i = 0; i < controller.getUsedDiscounts().size(); i++){
+       /* for(int i = 0; i < controller.getUsedDiscounts().size(); i++){
             defaultListModel.addElement(controller.getUsedDiscounts().get(i));
-        }
+        }*/
         if(defaultListModel.isEmpty()){
             defaultListModel.addElement("No previous discounts");
         }

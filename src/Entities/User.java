@@ -14,10 +14,10 @@ public class User {
     private String phone;
     private Roles role;
 
-    public User(String userName, String firstName, String password, String lastName, String email, String address, String city, String country, String phone) {
+    public User(String userName, String password, String firstName, String lastName, String email, String address, String city, String country, String phone) {
         this.userName = userName;
-        this.firstName = firstName;
         this.password = password;
+        this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.address = address;
