@@ -56,6 +56,26 @@ public class DeleteController {
         }
     }
 
+
+    public static void removeOrderAndStockEntry(int itemValue) {
+        connect();
+
+        try {
+            String delete = "DELETE FROM orders WHERE id = ?;\n" +
+                            "DELETE FROM stock WHERE order_id = ?;\n" +
+                            "DELETE FROM order_row WHERE order_id = ?;";
+            PreparedStatement statement = connection.prepareStatement(delete);
+            statement.setInt(1, itemValue);
+            statement.setInt(2, itemValue);
+            statement.setInt(3, itemValue);
+
+            statement.execute();
+            disconnect();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     /*
         PRODUCT RELATED
      */

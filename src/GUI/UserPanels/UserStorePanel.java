@@ -2,18 +2,21 @@ package GUI.UserPanels;
 
 import Controller.MainController;
 import Entities.ComboBoxItem;
+import Entities.ListItem;
+import Entities.OrderItem;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
 import java.util.Vector;
 
 public class UserStorePanel extends JPanel {
     private UserMainPanel userMainPanel;
     private MainController controller;
     private JList listProducts;
-    private DefaultListModel<ComboBoxItem> defaultListModel;
+    private DefaultListModel<ListItem> defaultListModel;
     private JScrollPane scrollPane;
 
     int productsAdded;
@@ -25,14 +28,17 @@ public class UserStorePanel extends JPanel {
     private JTextField txtSearch;
 
     private JButton btnSearch;
-    private JButton btnUpdate;
+    private JButton btnRemove;
     private JButton btnAddProduct;
+
+    private Vector<OrderItem> orderItems;
 
 
     public UserStorePanel(UserMainPanel userMainPanel, MainController controller){
         this.userMainPanel = userMainPanel;
         this.controller = controller;
         productsAdded = 0;
+        orderItems = new Vector<OrderItem>();
 
         initializeComponents();
         initializeGUI();
@@ -83,13 +89,13 @@ public class UserStorePanel extends JPanel {
         btnSearch.setBorderPainted(false);
         btnSearch.setBackground(Color.decode("#518A3D"));
 
-        btnUpdate = new JButton("Update List");
-        btnUpdate.setSize(new Dimension(200, 25));
-        btnUpdate.setPreferredSize(new Dimension(100, 25));
-        btnUpdate.setFont(new Font("Helvetica", Font.PLAIN, 12));
-        btnUpdate.setOpaque(true);
-        btnUpdate.setBorderPainted(false);
-        btnUpdate.setBackground(Color.decode("#518A3D"));
+        btnRemove = new JButton("Remove order");
+        btnRemove.setSize(new Dimension(200, 25));
+        btnRemove.setPreferredSize(new Dimension(100, 25));
+        btnRemove.setFont(new Font("Helvetica", Font.PLAIN, 12));
+        btnRemove.setOpaque(true);
+        btnRemove.setBorderPainted(false);
+        btnRemove.setBackground(Color.decode("#518A3D"));
 
         btnAddProduct = new JButton("Add product");
         btnAddProduct.setSize(new Dimension(200, 25));
@@ -102,36 +108,36 @@ public class UserStorePanel extends JPanel {
 
     private void initializeGUI() {
         setLayout(new GridBagLayout());
-        setPreferredSize(new Dimension(600,750));
-        setMaximumSize(new Dimension(600,750));
-        setMinimumSize(new Dimension(600,750));
+        setPreferredSize(new Dimension(600,550));
+        setMaximumSize(new Dimension(600,550));
+        setMinimumSize(new Dimension(600,550));
         setBackground(Color.decode("#2e2e2e"));
         GridBagConstraints gbc = new GridBagConstraints();
 
-        gbc.insets = new Insets(0, 0, 50, 0);
+        gbc.insets = new Insets(0, 0, 10, 0);
 
         gbc.gridy = 0;
         gbc.gridx = 0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         add(lblWelcome, gbc);
 
 
         gbc.gridy = 1;
         gbc.gridx = 0;
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(50, 0, 0, 0);
+        gbc.insets = new Insets(10, 0, 0, 0);
         add(txtSearch, gbc);
 
         gbc.gridy = 1;
         gbc.gridx = 1;
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(50, 0, 0, 0);
+        gbc.insets = new Insets(10, 0, 0, 0);
         add(cmbChoice, gbc);
 
         gbc.gridy = 1;
         gbc.gridx = 2;
         gbc.gridwidth = 1;
-        gbc.insets = new Insets(50, 0, 0, 0);
+        gbc.insets = new Insets(10, 0, 0, 0);
         add(btnSearch, gbc);
 
         gbc.gridy = 2;
@@ -143,7 +149,7 @@ public class UserStorePanel extends JPanel {
         gbc.gridy = 3;
         gbc.gridx = 0;
         gbc.gridwidth = 1;
-        add(btnUpdate, gbc);
+        add(btnRemove, gbc);
 
         gbc.gridy = 3;
         gbc.gridx = 1;
@@ -154,10 +160,23 @@ public class UserStorePanel extends JPanel {
         lblWelcome.setText("Welcome, " + userName + "!");
     }
 
-    public void updateProductList(Vector<ComboBoxItem> items){
+    public void updateOrderList(Vector<ListItem> items){
+        defaultListModel.removeAllElements();
+
+        if(items.isEmpty()) {
+            defaultListModel.addElement(new ListItem("No products found", -1, -1));
+        } else {
+            for(int i = 0; i < items.size(); i++){
+                defaultListModel.addElement(items.get(i));
+            }
+        }
+    }
+
+
+    public void updateProductList(Vector<ListItem> items){
         defaultListModel.removeAllElements();
         if(items.isEmpty()) {
-            defaultListModel.addElement(new ComboBoxItem("No products found", -1));
+            defaultListModel.addElement(new ListItem("No products found", -1, -1));
         } else {
             for(int i = 0; i < items.size(); i++){
                 defaultListModel.addElement(items.get(i));
@@ -167,7 +186,7 @@ public class UserStorePanel extends JPanel {
 
     private void registerListeners(){
         btnSearch.addActionListener(new BtnSearchActionListener());
-        btnUpdate.addActionListener(new BtnUpdateActionListener());
+        btnRemove.addActionListener(new BtnRemoveActionListener());
         btnAddProduct.addActionListener(new BtnAddProductListener());
     }
 
@@ -180,27 +199,34 @@ public class UserStorePanel extends JPanel {
             if(index == 0) {
                 updateProductList(controller.getAllProducts());
             } else if(index == 1) {
-                controller.btnPressed("SearchForProducts");
                 updateProductList(controller.getProductsByName(txtSearch.getText()));
             } else if(index == 2) {
-                controller.btnPressed("GetAllDiscounts");
                 updateProductList(controller.getAllDiscountedProducts());
             } else if(index == 3) {
-                controller.btnPressed("ViewOrders");
+                updateOrderList(controller.getAllOrders());
             } else if(index == 4) {
-                controller.btnPressed("SearchForProductsById");
                 updateProductList(controller.getProductsById(txtSearch.getText()));
             } else {
-                controller.btnPressed("SearchForProductsBySupplier");
+                updateProductList(controller.getProductsBySupplier(txtSearch.getText()));
             }
         }
+
+
     }
 
-    private class BtnUpdateActionListener implements ActionListener {
+    private class BtnRemoveActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            int index = listProducts.getSelectedIndex();
+            if(defaultListModel.get(index).getItemText().contains("PENDING")) {
+                controller.removeOrder(defaultListModel.get(index).getItemValue());
+                if(cmbChoice.getSelectedIndex() == 3) {
+                    updateProductList(controller.getAllOrders());
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "This is not a pending order!");
+            }
         }
     }
 
@@ -209,7 +235,78 @@ public class UserStorePanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            int nbrOf = Integer.parseInt(JOptionPane.showInputDialog(null, "How many would you like to buy?"));
+            int index = listProducts.getSelectedIndex();
+            int indexOf = defaultListModel.getElementAt(index).getItemText().indexOf('|');
+            String name = defaultListModel.getElementAt(index).getItemText().substring(0, indexOf);
+            boolean exists = false;
+            int existedIndex = -1;
 
+            //If order items is not empty
+            if(!orderItems.isEmpty()) {
+
+                //Check if item exists already
+                for(int i = 0; i < orderItems.size(); i++) {
+                    if(orderItems.get(i).getProductName().equals(name)) {
+                        exists = true;
+                        existedIndex = i;
+                    }
+                }
+
+                //If exists sum a new quantity, else just add the item
+                if(exists) {
+                    orderItems.get(existedIndex).setQuantity(orderItems.get(existedIndex).getQuantity() + nbrOf);
+                } else {
+                    orderItems.add(new OrderItem(defaultListModel.getElementAt(index).getItemText().substring(0, indexOf),
+                            defaultListModel.getElementAt(index).getItemValue(), nbrOf,defaultListModel.getElementAt(index).getItemPrice()));
+                }
+            } else {
+                //If it's empty just add the item
+                orderItems.add(new OrderItem(defaultListModel.getElementAt(index).getItemText().substring(0, indexOf),
+                        defaultListModel.getElementAt(index).getItemValue(), nbrOf,defaultListModel.getElementAt(index).getItemPrice()));
+            }
+
+            int stockNotAvailable = 0;
+            //if there is an order for this session
+            if(userMainPanel.getOrderId() != 0) {
+                //Only update the items
+                //If stock already exists, update, else add
+                for(int i = 0; i < orderItems.size(); i++) {
+                    if(controller.isProductAvailable(orderItems.get(i).getProductId(), orderItems.get(i).getQuantity())) {
+                        if(controller.stockEntryExists(orderItems.get(i).getProductId(), userMainPanel.getOrderId())) {
+                            controller.updateStock(orderItems.get(i).getProductId(), userMainPanel.getOrderId(), -orderItems.get(i).getQuantity());
+                        } else {
+                            controller.addStock(orderItems.get(i).getProductId(), userMainPanel.getOrderId(), -orderItems.get(i).getQuantity());
+                        }
+                    } else {
+                        stockNotAvailable = -1;
+                        orderItems.get(i).setQuantity(orderItems.get(i).getQuantity() - nbrOf);
+                    }
+
+                }
+
+            } else {
+                //If there is no order for this session
+                int orderId = controller.createCustomerOrder();
+                userMainPanel.setOrderId(orderId);
+
+                //Add items
+                for(int i = 0; i < orderItems.size(); i++) {
+                    if(controller.isProductAvailable(orderItems.get(i).getProductId(), orderItems.get(i).getQuantity())) {
+                        controller.reserveProduct(orderId, orderItems.get(i).getProductId(), -orderItems.get(i).getQuantity());
+                    } else {
+                        stockNotAvailable = -1;
+                    }
+                }
+            }
+
+
+            if(stockNotAvailable == -1) {
+                JOptionPane.showMessageDialog(null, "There is not enough in stock");
+            }
+
+            userMainPanel.updateOrderItems(orderItems);
         }
+
     }
 }

@@ -1,11 +1,13 @@
 package GUI.AdminPanels.HandleOrdersFrame;
 
 import Controller.MainController;
+import Entities.ListItem;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 
 public class HandleOrdersPanel extends JPanel {
     private MainController controller;
@@ -13,11 +15,11 @@ public class HandleOrdersPanel extends JPanel {
 
     private JLabel lblOrders;
 
-    private JList<String> listOrders;
+    private JList<ListItem> listOrders;
 
     private JScrollPane scrollPane;
 
-    private DefaultListModel<String> defaultListModel;
+    private DefaultListModel<ListItem> defaultListModel;
 
     private JButton btnConfirmOrder;
     private JButton btnExit;
@@ -32,7 +34,7 @@ public class HandleOrdersPanel extends JPanel {
         initializeComponents();
         initializeGUI();
         registerListener();
-
+        updateList(controller.getAllUsersOrders());
     }
 
     private void initializeComponents() {
@@ -97,12 +99,24 @@ public class HandleOrdersPanel extends JPanel {
 
     private void registerListener() {
         btnExit.addActionListener(new BtnExitListener());
+        btnConfirmOrder.addActionListener(new BtnConfirmListener());
     }
 
-    public void updateList(){
+    public void updateList(Vector<ListItem> allOrders){
         defaultListModel.removeAllElements();
-        for(int i = 0; i < handleOrdersFrame.getOrdersList().size(); i++){
-            defaultListModel.addElement(handleOrdersFrame.getOrdersList().get(i));
+        for(int i = 0; i < allOrders.size(); i++){
+            defaultListModel.addElement(allOrders.get(i));
+        }
+    }
+
+    private class BtnConfirmListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int index = listOrders.getSelectedIndex();
+            if(index >= 0) {
+                controller.confirmOrder(defaultListModel.get(index).getItemValue());
+                updateList(controller.getAllUsersOrders());
+            }
         }
     }
 

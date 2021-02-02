@@ -132,9 +132,6 @@ public class ApplicationMainPanel extends JPanel {
         controller.openViewUsedDiscountsFrame();
     }
 
-    public void updateUsedDiscounts() {
-        controller.updateUsedDiscounts();
-    }
 
 
     public ArrayList<String> getProductsForCustomers() {

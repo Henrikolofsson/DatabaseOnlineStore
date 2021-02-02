@@ -40,6 +40,61 @@ public class UpdateController {
         }
     }
 
+    public static void updateStock(int productId, int orderId, int quantity) {
+        connect();
+
+        try {
+            String update = "UPDATE stock SET amount = ? " +
+                    "WHERE product_id = ? " +
+                    "AND order_id = ?;";
+            PreparedStatement statement = connection.prepareStatement(update);
+            statement.setInt(1, quantity);
+            statement.setInt(2, productId);
+            statement.setInt(3, orderId);
+            statement.executeUpdate();
+            disconnect();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void placeOrder(int orderId) {
+        connect();
+
+        try {
+            String update = "UPDATE orders SET status = ? " +
+                    "WHERE id = ?;";
+            PreparedStatement statement = connection.prepareStatement(update);
+            statement.setString(1, "PENDING");
+            statement.setInt(2, orderId);
+            statement.executeUpdate();
+            disconnect();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void confirmOrder(int itemValue) {
+        connect();
+
+        try {
+            String update = "UPDATE orders SET status = ? " +
+                    "WHERE id = ?;" +
+                    "UPDATE stock SET status = ? " +
+                    "WHERE order_id = ?;";
+            PreparedStatement statement = connection.prepareStatement(update);
+            statement.setString(1, "SHIPPED");
+            statement.setInt(2, itemValue);
+            statement.setString(3, "SHIPPED");
+            statement.setInt(4, itemValue);
+            statement.executeUpdate();
+
+            disconnect();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void addProductToShoppingCart(int newQuantity, int productID) {
         connect();
 

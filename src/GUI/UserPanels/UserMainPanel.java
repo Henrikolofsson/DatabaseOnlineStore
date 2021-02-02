@@ -1,18 +1,21 @@
 package GUI.UserPanels;
 
 import Controller.MainController;
+import Entities.OrderItem;
 import GUI.ApplicationMainPanel;
 import GUI.UserPanels.ShoppingCartFrame.ShoppingCartPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Vector;
 
 public class UserMainPanel extends JPanel {
     private ApplicationMainPanel applicationMainPanel;
     private MainController controller;
     private UserOptionsPanel optionsPanel;
     private UserStorePanel userStorePanel;
+    private int orderId;
 
     public UserMainPanel(ApplicationMainPanel applicationMainPanel, MainController controller){
         this.applicationMainPanel = applicationMainPanel;
@@ -23,8 +26,9 @@ public class UserMainPanel extends JPanel {
     }
 
     private void initializeComponents(){
-        this.optionsPanel = new UserOptionsPanel(this);
+        this.optionsPanel = new UserOptionsPanel(this,controller);
         this.userStorePanel = new UserStorePanel(this, controller);
+        orderId = 0;
     }
 
     private void initializeGUI(){
@@ -44,29 +48,19 @@ public class UserMainPanel extends JPanel {
         add(userStorePanel, gbc);
     }
 
-    public ArrayList<String> getAllProducts() {
-        return applicationMainPanel.getAllProducts();
-    }
-
-    public ArrayList<String> getSearchedProducts(String searchedCode, String searchedSupplier, String searchedProduct) {
-        return applicationMainPanel.getSearchedProducts(searchedCode, searchedSupplier, searchedProduct);
-    }
-
     public void updateFirstname(String userName) {
         userStorePanel.updateFirstname(userName);
     }
 
-
-    public void updateShoppingCartBtn(int productsAdded) {
-        optionsPanel.updateShoppingCartBtn(productsAdded);
+    public void updateOrderItems(Vector<OrderItem> orderItems) {
+        optionsPanel.updateOrderItems(orderItems);
     }
 
-    public void getOrderedProducts(int productID, int nbrOfItems) {
-
+    public int getOrderId() {
+        return orderId;
     }
 
-
-    public ArrayList<String> getProductsForCustomers() {
-        return applicationMainPanel.getProductsForCustomers();
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 }

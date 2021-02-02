@@ -1,13 +1,14 @@
 package Controller;
 
-import Database.DatabaseController;
-import Database.QueryController;
+import Database.*;
 import Entities.*;
 import Enums.Countries;
 import GUI.AdminPanels.AddDiscountFrame.AddDiscountFrame;
 import GUI.AdminPanels.AddProductFrame.AddProductFrame;
 import GUI.AdminPanels.AddSupplierFrame.AddSupplierFrame;
 import GUI.AdminPanels.DeleteProductFrame.DeleteProductFrame;
+import GUI.AdminPanels.DisplayProductSaleFrame.DisplayProductSaleFrame;
+import GUI.AdminPanels.HandleDiscountFrame.HandleDiscountFrame;
 import GUI.AdminPanels.HandleOrdersFrame.HandleOrdersFrame;
 import GUI.AdminPanels.HandleProductFrame.HandleProductFrame;
 import GUI.AdminPanels.ViewUsedDiscountsFrame.ViewUsedDiscountsFrame;
@@ -18,7 +19,6 @@ import Interfaces.PanelListener;
 import javax.swing.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 
@@ -46,6 +46,8 @@ public class MainController implements PanelListener {
     private HandleProductFrame handleProductFrame;
     private HandleOrdersFrame handleOrdersFrame;
     private ViewUsedDiscountsFrame viewUsedDiscountsFrame;
+    private DisplayProductSaleFrame displayProductSaleFrame;
+    private HandleDiscountFrame handleDiscountFrame;
 
 
     private String userName;
@@ -83,10 +85,6 @@ public class MainController implements PanelListener {
             return true;
         }
         return false;
-    }
-
-    public void updateUsedDiscounts() {
-        viewUsedDiscountsFrame.updateUsedDiscounts();
     }
 
 
@@ -133,6 +131,12 @@ public class MainController implements PanelListener {
                 break;
 
             case "OpenViewUsedDiscountsWindow": openViewUsedDiscountsFrame();
+                break;
+
+            case "OpenHandleDiscountsWindow": openHandleDiscountsWindow();
+                break;
+
+            case "OpenGetDisplayProductSaleWindow": openDisplayProductSaleFrame();
                 break;
 
             /*
@@ -250,6 +254,14 @@ public class MainController implements PanelListener {
         viewUsedDiscountsFrame = new ViewUsedDiscountsFrame(this);
     }
 
+    private void openDisplayProductSaleFrame() {
+        displayProductSaleFrame = new DisplayProductSaleFrame(this);
+    }
+
+    private void openHandleDiscountsWindow() {
+        handleDiscountFrame = new HandleDiscountFrame(this);
+    }
+
     /*
         Functions for adding items to the database
      */
@@ -332,20 +344,131 @@ public class MainController implements PanelListener {
         return QueryController.getActiveProducts();
     }
 
-    public Vector<ComboBoxItem> getAllProducts() {
+    public Vector<ListItem> getAllProducts() {
         return QueryController.getAllProducts();
     }
 
 
-    public Vector<ComboBoxItem> getProductsByName(String text) {
+    public Vector<ListItem> getProductsByName(String text) {
         return QueryController.getProductsByName(text);
     }
 
-    public Vector<ComboBoxItem> getAllDiscountedProducts() {
+    public Vector<ListItem> getAllDiscountedProducts() {
         return QueryController.getAllDiscountedProducts();
     }
 
-    public Vector<ComboBoxItem> getProductsById(String id) {
+    public Vector<ListItem> getProductsById(String id) {
         return QueryController.getProductsById(Integer.parseInt(id));
+    }
+
+    public Vector<ListItem> getProductsBySupplier(String text) {
+        return QueryController.getProductsBySupplier(text);
+    }
+
+    public boolean isProductAvailable(int productId, int quantity) {
+        return QueryController.isProductAvailable(productId, quantity);
+    }
+
+    public int createCustomerOrder() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        java.sql.Date dateToday;
+
+        try {
+            java.util.Date date = format.parse(java.time.LocalDate.now().toString());
+            dateToday = new java.sql.Date(date.getTime());
+            return InsertController.addOrder(new Order(userId, dateToday, "KO"));
+        } catch(ParseException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public void reserveProduct(int orderId, int productId, int quantity) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        java.sql.Date dateToday;
+
+        try {
+            java.util.Date date = format.parse(java.time.LocalDate.now().toString());
+            dateToday = new java.sql.Date(date.getTime());
+            InsertController.reserveProduct(orderId,productId, quantity, dateToday);
+        } catch(ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean stockEntryExists(int productId, int orderId) {
+        return QueryController.stockEntryExists(productId, orderId);
+    }
+
+    public void updateStock(int productId, int orderId, int quantity) {
+        UpdateController.updateStock(productId, orderId, quantity);
+    }
+
+    public void addStock(int productId, int orderId, int quantity) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        java.sql.Date dateToday;
+
+        try {
+            java.util.Date date = format.parse(java.time.LocalDate.now().toString());
+            dateToday = new java.sql.Date(date.getTime());
+            InsertController.reserveProduct(orderId,productId, quantity, dateToday);
+        } catch(ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void placeOrder(int orderId) {
+        UpdateController.placeOrder(orderId);
+    }
+
+    public void addOrderRow(int orderId, OrderItem item) {
+        InsertController.addOrderRow(new OrderRow(orderId, item.getProductId(), item.getQuantity()));
+    }
+
+    public Vector<ListItem> getAllOrders() {
+        return QueryController.getAllOrders(userId);
+    }
+
+    public Vector<ListItem> getAllUsersOrders() {
+        return QueryController.getAllUsersOrders();
+    }
+
+    public void removeOrder(int itemValue) {
+        DeleteController.removeOrderAndStockEntry(itemValue);
+    }
+
+    public void confirmOrder(int itemValue) {
+        UpdateController.confirmOrder(itemValue);
+    }
+
+
+    public Vector<ListItem> getSales(String month) {
+        return switch (month) {
+            case "January" -> QueryController.getProductSales("2021-01-01", "2021-01-31");
+            case "February" -> QueryController.getProductSales("2021-02-01", "2021-02-28");
+            case "March" -> QueryController.getProductSales("2021-03-01", "2021-03-31");
+            case "April" -> QueryController.getProductSales("2021-04-01", "2021-04-30");
+            case "May" -> QueryController.getProductSales("2021-05-01", "2021-05-31");
+            case "June" -> QueryController.getProductSales("2021-06-01", "2021-06-30");
+            case "July" -> QueryController.getProductSales("2021-07-01", "2021-07-31");
+            case "August" -> QueryController.getProductSales("2021-08-01", "2021-08-31");
+            case "September" -> QueryController.getProductSales("2021-09-01", "2021-09-30");
+            case "October" -> QueryController.getProductSales("2021-10-01", "2021-10-31");
+            case "November" -> QueryController.getProductSales("2021-11-01", "2021-11-30");
+            case "December" -> QueryController.getProductSales("2021-12-01", "2021-12-31");
+            default -> null;
+        };
+    }
+
+    public Vector<ListItem> getDiscountHistory() {
+        return QueryController.getDiscountHistory();
+    }
+
+    public Vector<ComboBoxItem> getAllDiscounts() {
+        return QueryController.getAllDiscounts();
+    }
+
+    public void addProductDiscount(int productId, int discountId) {
+        InsertController.addProductDiscount(productId, discountId);
     }
 }

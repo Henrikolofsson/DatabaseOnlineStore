@@ -17,7 +17,6 @@ public class InsertController {
         connection = null;
         try {
             connection = DriverManager.getConnection(DB_URL, user, password);
-            System.out.println("Connection to database successful.");
         } catch(SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -215,6 +214,46 @@ public class InsertController {
             statement.execute();
 
             statement.close();
+            disconnect();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void reserveProduct(int orderId, int productId, int quantity, Date dateToday) {
+        connect();
+        System.out.println(orderId);
+        System.out.println(productId);
+        System.out.println(quantity);
+
+        try {
+            String insert = "INSERT INTO stock(id, product_id, date, order_id, amount, status) VALUES(DEFAULT, ?, ?, ?, ?, ?) RETURNING id;";
+
+            PreparedStatement statement = connection.prepareStatement(insert);
+            statement.setInt(1, productId);
+            statement.setDate(2, dateToday);
+            statement.setInt(3,orderId);
+            statement.setInt(4, quantity);
+            statement.setString(5, "RES");
+
+            statement.execute();
+            statement.close();
+            disconnect();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void addProductDiscount(int productId, int discountId) {
+        connect();
+
+        try {
+            String insert = "INSERT INTO assigned_discounts(id, discount_id, product_id) VALUES(DEFAULT, ?, ?);";
+            PreparedStatement statement = connection.prepareStatement(insert);
+            statement.setInt(1, discountId);
+            statement.setInt(2, productId);
+
+            statement.execute();
             disconnect();
         } catch(SQLException e) {
             e.printStackTrace();

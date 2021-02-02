@@ -151,7 +151,7 @@ public class HandleProductPanel extends JPanel {
     private class BtnExitListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            handleProductFrame.dispose();
         }
 
     }

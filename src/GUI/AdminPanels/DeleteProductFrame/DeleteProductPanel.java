@@ -98,14 +98,12 @@ public class DeleteProductPanel extends JPanel{
         btnExit.addActionListener(new BtnExitListener());
     }
 
-    //TODO: Get the correct product id to delete!!
     public int getProduct() {
         int index = cmbBoxProducts.getSelectedIndex();
         return cmbBoxProducts.getItemAt(index).getItemValue();
     }
 
     private class BtnExitListener implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
             deleteProductFrame.dispose();

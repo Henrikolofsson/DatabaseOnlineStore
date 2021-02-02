@@ -1,19 +1,21 @@
 package GUI.AdminPanels.ViewUsedDiscountsFrame;
 
 import Controller.MainController;
+import Entities.ListItem;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 
 public class ViewUsedDiscountsPanel extends JPanel {
     private MainController controller;
     private ViewUsedDiscountsFrame viewUsedDiscountsFrame;
-    private JList<String> listUsedDiscounts;
+    private JList<ListItem> listUsedDiscounts;
     private JScrollPane scrollPane;
 
-    private DefaultListModel<String> defaultListModel;
+    private DefaultListModel<ListItem> defaultListModel;
 
     private JButton btnExit;
 
@@ -23,7 +25,7 @@ public class ViewUsedDiscountsPanel extends JPanel {
         this.viewUsedDiscountsFrame = viewUsedDiscountsFrame;
 
         initializeComponents();
-        updateUsedDiscountList();
+        updateUsedDiscountList(controller.getDiscountHistory());
         initializeGUI();
         registerListeners();
     }
@@ -32,20 +34,14 @@ public class ViewUsedDiscountsPanel extends JPanel {
         defaultListModel = new DefaultListModel<>();
 
         listUsedDiscounts = new JList<>(defaultListModel);
-       /* for(int i = 0; i < controller.getUsedDiscounts().size(); i++){
-            defaultListModel.addElement(controller.getUsedDiscounts().get(i));
-        }*/
-        if(defaultListModel.isEmpty()){
-            defaultListModel.addElement("No previous discounts");
-        }
-        listUsedDiscounts.setSize(new Dimension(400, 400));
-        listUsedDiscounts.setPreferredSize(new Dimension(500, 400));
-        listUsedDiscounts.setMinimumSize(new Dimension(500, 400));
+        listUsedDiscounts.setSize(new Dimension(800, 400));
+        listUsedDiscounts.setPreferredSize(new Dimension(800, 400));
+        listUsedDiscounts.setMinimumSize(new Dimension(800, 400));
 
         scrollPane = new JScrollPane(listUsedDiscounts, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setSize(new Dimension(300, 300));
-        scrollPane.setPreferredSize(new Dimension(300, 300));
-        scrollPane.setMinimumSize(new Dimension(300, 300));
+        scrollPane.setSize(new Dimension(500, 300));
+        scrollPane.setPreferredSize(new Dimension(500, 300));
+        scrollPane.setMinimumSize(new Dimension(500, 300));
 
         btnExit = new JButton("Exit");
         btnExit.setSize(new Dimension(100, 25));
@@ -81,13 +77,15 @@ public class ViewUsedDiscountsPanel extends JPanel {
         btnExit.addActionListener(new BtnExitListener());
     }
 
-    public void updateUsedDiscountList(){
+    public void updateUsedDiscountList(Vector<ListItem> items){
         defaultListModel.removeAllElements();
-       /* for(int i = 0; i < controller.getUsedDiscounts().size(); i++){
-            defaultListModel.addElement(controller.getUsedDiscounts().get(i));
-        }*/
-        if(defaultListModel.isEmpty()){
-            defaultListModel.addElement("No previous discounts");
+
+        for(int i = 0; i < items.size(); i++){
+            defaultListModel.addElement(items.get(i));
+        }
+
+        if(defaultListModel.isEmpty()) {
+            defaultListModel.addElement(new ListItem("No discounted products found", -1, -1));
         }
     }
 

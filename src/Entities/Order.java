@@ -29,7 +29,6 @@ public class Order {
         this.date = date;
     }
 
-
     public String getStatus() {
         return status;
     }

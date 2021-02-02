@@ -1,6 +1,7 @@
 package GUI;
 
 import Controller.MainController;
+import Entities.ListItem;
 import GUI.AdminPanels.AdminMainPanel;
 import GUI.AdminPanels.AdminStorePanel;
 
@@ -8,12 +9,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 
 public class StorePanel extends JPanel {
     private ApplicationMainPanel applicationMainPanel;
-
-    private JList listProducts;
-    private DefaultListModel<String> defaultListModel;
+    private MainController controller;
+    private JList<ListItem> listProducts;
+    private DefaultListModel<ListItem> defaultListModel;
     private JScrollPane scrollPane;
 
     private JLabel lblWelcome;
@@ -25,8 +27,9 @@ public class StorePanel extends JPanel {
 
     public StorePanel(ApplicationMainPanel applicationMainPanel, MainController controller) {
         this.applicationMainPanel = applicationMainPanel;
+        this.controller = controller;
         initializeComponents();
-        updateProductList();
+        updateProductList(controller.getAllProducts());
         initializeGUI();
         registerListeners();
     }
@@ -72,10 +75,10 @@ public class StorePanel extends JPanel {
         btnUpdate.setBackground(Color.decode("#518A3D"));
     }
 
-    public void updateProductList(){
+    public void updateProductList(Vector<ListItem> products){
         defaultListModel.removeAllElements();
-        for(int i = 0; i < applicationMainPanel.getProductsForCustomers().size(); i++){
-            defaultListModel.addElement(applicationMainPanel.getProductsForCustomers().get(i));
+        for(int i = 0; i < products.size(); i++){
+            defaultListModel.addElement(products.get(i));
         }
     }
 
@@ -133,39 +136,16 @@ public class StorePanel extends JPanel {
 
     }
 
-    public void updateSearchedProducts(String searchedCode, String searchedSupplier, String searchedProduct){
-        defaultListModel.removeAllElements();
-        for(int i = 0; i < applicationMainPanel.getSearchedProducts(searchedCode, searchedSupplier, searchedProduct).size(); i++){
-            defaultListModel.addElement(applicationMainPanel.getSearchedProducts(searchedCode, searchedSupplier, searchedProduct).get(i));
-        }
-        if(defaultListModel.isEmpty()){
-            defaultListModel.addElement("No products found");
-        }
-    }
 
 
     private class BtnSearchActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String searchedCode = txtSearch.getText();
-            String searchedSupplier = txtSearch.getText();
-            String searchedProduct = txtSearch.getText();
-
-            if(isParsable(searchedCode)){
-                searchedProduct = null;
-                searchedSupplier = null;
-            }
-            else {
-                searchedCode = null;
-            }
-
-            if(!txtSearch.getText().isEmpty()){
-                applicationMainPanel.getSearchedProducts(searchedCode, searchedSupplier, searchedProduct);
-                updateSearchedProducts(searchedCode, searchedSupplier, searchedProduct);
+            if(txtSearch.getText().isEmpty()) {
+                updateProductList(controller.getAllProducts());
             } else {
-                applicationMainPanel.getAllProducts();
-                updateProductList();
+                updateProductList(controller.getProductsByName(txtSearch.getText()));
             }
         }
     }
@@ -174,8 +154,7 @@ public class StorePanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            applicationMainPanel.getAllProducts();
-            updateProductList();
+
         }
     }
 }

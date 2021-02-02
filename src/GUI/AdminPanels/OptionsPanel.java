@@ -30,7 +30,7 @@ public class OptionsPanel extends JPanel {
 
     private void initializeComponents(){
         options = new String[]{"Add supplier", "Add discount", "Add product", "Delete product", "Handle product",
-                "Handle orders", "Discount history"};
+                "Handle orders", "Product sales", "Handle discounts", "Discount history"};
 
         cmbBoxOptions = new JComboBox<>();
         for(int i = 0; i < options.length; i++){
@@ -90,6 +90,10 @@ public class OptionsPanel extends JPanel {
                 panelListener.btnPressed("OpenHandleProductWindow");
             } else if(cmbBoxOptions.getSelectedIndex() == 5){
                 panelListener.btnPressed("OpenHandleOrdersWindow");
+            } else if(cmbBoxOptions.getSelectedIndex() == 6){
+                panelListener.btnPressed("OpenGetDisplayProductSaleWindow");
+            } else if(cmbBoxOptions.getSelectedIndex() == 7){
+                panelListener.btnPressed("OpenHandleDiscountsWindow");
             } else {
                 panelListener.btnPressed("OpenViewUsedDiscountsWindow");
             }

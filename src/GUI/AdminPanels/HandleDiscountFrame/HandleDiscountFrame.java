@@ -1,17 +1,18 @@
-package GUI.AdminPanels.ViewUsedDiscountsFrame;
+package GUI.AdminPanels.HandleDiscountFrame;
 
 import Controller.MainController;
 import Database.DatabaseController;
-import GUI.AdminPanels.HandleProductFrame.HandleProductPanel;
+import GUI.AdminPanels.AddSupplierFrame.AddSupplierPanel;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class ViewUsedDiscountsFrame extends JFrame {
+public class HandleDiscountFrame extends JFrame {
     private MainController controller;
-    private ViewUsedDiscountsPanel viewUsedDiscountsPanel;
+    private DatabaseController databaseController;
+    private HandleDiscountPanel handleDiscountPanel;
 
-    public ViewUsedDiscountsFrame(MainController controller) {
+    public HandleDiscountFrame(MainController controller) {
         this.controller = controller;
         initializeComponents();
         initializeGUI();
@@ -19,17 +20,17 @@ public class ViewUsedDiscountsFrame extends JFrame {
 
     private void initializeComponents() {
         //Default JFrame initializations
-        setTitle("Discount history");
-        setSize(new Dimension(600,600));
-        setMinimumSize(new Dimension(600, 600));
-        setPreferredSize(new Dimension(600,600));
+        setTitle("Create account");
+        setSize(new Dimension(500,400));
+        setMinimumSize(new Dimension(500, 400));
+        setPreferredSize(new Dimension(500,400));
         setDefaultCloseOperation(this.EXIT_ON_CLOSE);
         setVisible(true);
         setResizable(false);
         setBackground(Color.WHITE);
         setLayout(new GridLayout(1,2, 1, 0));
 
-        viewUsedDiscountsPanel = new ViewUsedDiscountsPanel(controller, this);
+        handleDiscountPanel = new HandleDiscountPanel(this, controller);
     }
 
     private void initializeGUI() {
@@ -38,10 +39,11 @@ public class ViewUsedDiscountsFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(viewUsedDiscountsPanel, gbc);
+        add(handleDiscountPanel,gbc);
 
         pack();
         setLocation(new Point(300, 100));
     }
+
 
 }

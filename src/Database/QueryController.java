@@ -1,10 +1,13 @@
 package Database;
 
 import Entities.*;
+import org.postgresql.util.PSQLException;
 
 import javax.swing.*;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class QueryController {
@@ -258,67 +261,114 @@ public class QueryController {
         }
     }
 
-    public static Vector<ComboBoxItem> getAllProducts() {
+    public static Vector<ComboBoxItem> getNonOrderedProducts() {
+        connect();
+
+        Vector<ComboBoxItem> activeProducts = new Vector<ComboBoxItem>();
+
+        try {
+            String query = "SELECT prod.id, prod.name, st.status\n" +
+                    "FROM products prod\n" +
+                    "INNER JOIN stocks st ON prod.id = st.product_id\n" +
+                    "WHERE prod.status LIKE 'Aktiv'\n" +
+                    "AND st.status LIKE 'RES'\n" +
+                    "OR\n" +
+                    "WHERE prod.status LIKE 'Aktiv'\n" +
+                    "AND st.status LIKE 'SHIPPED';";
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            ResultSet rs = statement.executeQuery();
+
+            while(rs.next()) {
+                activeProducts.add(new ComboBoxItem(rs.getString(2),rs.getInt(1)));
+            }
+            rs.close();
+            disconnect();
+
+            return activeProducts;
+
+
+        } catch(SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Vector<ListItem> getAllProducts() {
         connect();
 
         try {
-            String query = "SELECT prod.id, prod.name, prod.price, adc.discount_id, dis.reason, sup.name, dis.percentage, (prod.price * ((100 - dis.percentage) / 100)) " +
-                            "FROM products prod " +
-                            "LEFT JOIN assigned_discounts adc ON prod.id = adc.product_id " +
-                            "LEFT JOIN discount dis ON adc.discount_id = dis.id " +
-                            "LEFT JOIN supplier sup ON prod.supplier_id = sup.id " +
-                            "WHERE prod.status = 'Aktiv';";
+            String query = "SELECT prod.id, prod.name, prod.price, adc.discount_id, dis.reason, sup.name, dis.percentage, (prod.price * ((100 - dis.percentage) / 100))\n" +
+                    "FROM products prod \n" +
+                    "LEFT JOIN assigned_discounts adc ON prod.id = adc.product_id \n" +
+                    "LEFT JOIN discount dis ON adc.discount_id = dis.id\n" +
+                    "LEFT JOIN supplier sup ON prod.supplier_id = sup.id\n" +
+                    "WHERE prod.status = 'Aktiv'\n" +
+                    "AND (dis.end_date > CURRENT_DATE AND dis.start_date < CURRENT_DATE)\n" +
+                    "OR prod.status = 'Aktiv' AND dis.end_date IS null;";
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet rs = statement.executeQuery();
 
-           Vector<ComboBoxItem> allProducts = new Vector<>();
+           Vector<ListItem> allProducts = new Vector<>();
            ProductInformation productInformation;
            while(rs.next()) {
                if(rs.getInt(4) > 0) {
                    productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getInt(4),
                            rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
-                   allProducts.add(new ComboBoxItem(productInformation.toString(), productInformation.getProductId()));
+                   ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getDiscountedPrice());
+                   allProducts.add(listItem);
+                   System.out.println(listItem);
+                   //System.out.println(productInformation.toString() + ":" + productInformation.getProductId() + ":" + productInformation.getProductPrice());
                } else {
                    productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), -1,
                            rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
-                   allProducts.add(new ComboBoxItem(productInformation.toString(), productInformation.getProductId()));
+                   ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getProductPrice());
+                   allProducts.add(listItem);
+                   System.out.println(listItem);
+                   //System.out.println(productInformation.toString() + ":" + productInformation.getProductId() + ":" + productInformation.getProductPrice());
+                   //allProducts.add(new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getProductPrice()));
                }
            }
+
+
 
             rs.close();
             disconnect();
             return allProducts;
         } catch(SQLException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
-    public static Vector<ComboBoxItem> getProductsByName(String text) {
+    public static Vector<ListItem> getProductsByName(String text) {
         connect();
 
         try {
-            String query = "SELECT prod.id, prod.name, prod.price, adc.discount_id, dis.reason, sup.name, dis.percentage, (prod.price * ((100 - dis.percentage) / 100)) " +
-                    "FROM products prod " +
-                    "LEFT JOIN assigned_discounts adc ON prod.id = adc.product_id " +
-                    "LEFT JOIN discount dis ON adc.discount_id = dis.id " +
-                    "LEFT JOIN supplier sup ON prod.supplier_id = sup.id " +
-                    "WHERE prod.status = 'Aktiv'" +
-                    "AND prod.name = '" + text + "';";
+            String query = "SELECT prod.id, prod.name, prod.price, adc.discount_id, dis.reason, sup.name, dis.percentage, (prod.price * ((100 - dis.percentage) / 100))\n" +
+                    "FROM products prod \n" +
+                    "LEFT JOIN assigned_discounts adc ON prod.id = adc.product_id \n" +
+                    "LEFT JOIN discount dis ON adc.discount_id = dis.id\n" +
+                    "LEFT JOIN supplier sup ON prod.supplier_id = sup.id\n" +
+                    "WHERE prod.status = 'Aktiv'\n" +
+                    "AND (dis.end_date > CURRENT_DATE AND dis.start_date < CURRENT_DATE) AND prod.name = '" + text + "'\n" +
+                    "OR prod.status = 'Aktiv' AND dis.end_date IS null AND prod.name = '" + text + "';";
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet rs = statement.executeQuery();
 
-            Vector<ComboBoxItem> allProducts = new Vector<>();
+            Vector<ListItem> allProducts = new Vector<>();
             ProductInformation productInformation;
             while(rs.next()) {
                 if(rs.getInt(4) > 0) {
                     productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getInt(4),
                             rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
-                    allProducts.add(new ComboBoxItem(productInformation.toString(), productInformation.getProductId()));
+                    ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getDiscountedPrice());
+                    allProducts.add(listItem);
                 } else {
                     productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), -1,
                             rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
-                    allProducts.add(new ComboBoxItem(productInformation.toString(), productInformation.getProductId()));
+                    ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getProductPrice());
+                    allProducts.add(listItem);
                 }
             }
 
@@ -331,7 +381,7 @@ public class QueryController {
         return null;
     }
 
-    public static Vector<ComboBoxItem> getAllDiscountedProducts() {
+    public static Vector<ListItem> getAllDiscountedProducts() {
         connect();
 
         try {
@@ -345,17 +395,19 @@ public class QueryController {
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet rs = statement.executeQuery();
 
-            Vector<ComboBoxItem> allDiscountedProducts = new Vector<>();
+            Vector<ListItem> allDiscountedProducts = new Vector<>();
             ProductInformation productInformation;
             while(rs.next()) {
                 if(rs.getInt(4) > 0) {
                     productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getInt(4),
                             rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
-                    allDiscountedProducts.add(new ComboBoxItem(productInformation.toString(), productInformation.getProductId()));
+                    ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getDiscountedPrice());
+                    allDiscountedProducts.add(listItem);
                 } else {
                     productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), -1,
                             rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
-                    allDiscountedProducts.add(new ComboBoxItem(productInformation.toString(), productInformation.getProductId()));
+                    ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getProductPrice());
+                    allDiscountedProducts.add(listItem);
                 }
 
             }
@@ -369,33 +421,37 @@ public class QueryController {
         return null;
     }
 
-    public static Vector<ComboBoxItem> getProductsById(int productId) {
+    public static Vector<ListItem> getProductsById(int productId) {
         connect();
 
         try {
-            String query = "SELECT prod.id, prod.name, prod.price, adc.discount_id, dis.reason, sup.name, dis.percentage, (prod.price * ((100 - dis.percentage) / 100))" +
-                    "FROM products prod " +
-                    "INNER JOIN assigned_discounts adc ON prod.id = adc.product_id " +
-                    "LEFT JOIN discount dis ON adc.discount_id = dis.id " +
-                    "LEFT JOIN supplier sup ON prod.supplier_id = sup.id " +
-                    "WHERE prod.status = 'Aktiv' " +
-                    "AND prod.id = ?;";
+            String query = "SELECT prod.id, prod.name, prod.price, adc.discount_id, dis.reason, sup.name, dis.percentage, (prod.price * ((100 - dis.percentage) / 100))\n" +
+                    "FROM products prod \n" +
+                    "LEFT JOIN assigned_discounts adc ON prod.id = adc.product_id \n" +
+                    "LEFT JOIN discount dis ON adc.discount_id = dis.id\n" +
+                    "LEFT JOIN supplier sup ON prod.supplier_id = sup.id\n" +
+                    "WHERE prod.status = 'Aktiv'\n" +
+                    "AND (dis.end_date > CURRENT_DATE AND dis.start_date < CURRENT_DATE) AND prod.id = ?" +
+                    "OR prod.status = 'Aktiv' AND dis.end_date IS null AND prod.id = ?;";
 
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, productId);
+            statement.setInt(2, productId);
             ResultSet rs = statement.executeQuery();
 
-            Vector<ComboBoxItem> allProductsById = new Vector<>();
+            Vector<ListItem> allProductsById = new Vector<>();
             ProductInformation productInformation;
             while(rs.next()) {
                 if(rs.getInt(4) > 0) {
                     productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getInt(4),
                             rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
-                    allProductsById.add(new ComboBoxItem(productInformation.toString(), productInformation.getProductId()));
+                    ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getDiscountedPrice());
+                    allProductsById.add(listItem);
                 } else {
                     productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), -1,
                             rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
-                    allProductsById.add(new ComboBoxItem(productInformation.toString(), productInformation.getProductId()));
+                    ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getProductPrice());
+                    allProductsById.add(listItem);
                 }
 
             }
@@ -409,486 +465,251 @@ public class QueryController {
         return null;
     }
 
-    /*
-
-     *//*
-        USER RELATED
-        ---------------------------------------------------------------------------------------------------------------------------------------------------------
-     *//*
-
-
-    public void retrieveFirstName(String userNameLogin) {
-        connect();
-        try {
-
-            *//*String query =
-                    "SELECT user_fname, admin_fname \n" +
-                    "FROM users  \n" +
-                    "INNER JOIN admins ON user_id = admin_id\n" +
-                    "WHERE user_name LIKE ?";*//*
-
-            String query =
-                    "SELECT user_fname FROM users WHERE user_name LIKE ?;";
-
-            PreparedStatement stmt = connection.prepareStatement(query);
-            stmt.setString(1, userNameLogin);
-
-            ResultSet rs = stmt.executeQuery();
-
-            String firstName = "";
-
-            while(rs.next()) {
-                firstName = rs.getString(1);
-            }
-            LoggedIn loggedIn = new LoggedIn();
-            loggedIn.updateLabelLoggedIn(firstName);
-            stmt.close();
-            rs.close();
-            disconnect();
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String getFirstName(String usernameLogin, String passwordLogin) {
-        String firstname = "";
-
+    public static Vector<ListItem> getProductsBySupplier(String text) {
         connect();
 
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT user_name, user_password, user_fname, admin_name, admin_password, admin_fname FROM users, admins");
-            ResultSet rs = stmt.executeQuery();
+            String query = "SELECT prod.id, prod.name, prod.price, adc.discount_id, dis.reason, sup.name, dis.percentage, (prod.price * ((100 - dis.percentage) / 100))\n" +
+                    "FROM products prod \n" +
+                    "LEFT JOIN assigned_discounts adc ON prod.id = adc.product_id \n" +
+                    "LEFT JOIN discount dis ON adc.discount_id = dis.id\n" +
+                    "LEFT JOIN supplier sup ON prod.supplier_id = sup.id\n" +
+                    "WHERE prod.status = 'Aktiv'\n" +
+                    "AND (dis.end_date > CURRENT_DATE AND dis.start_date < CURRENT_DATE) AND sup.name = ?" +
+                    "OR prod.status = 'Aktiv' AND dis.end_date IS null AND sup.name = ?;";
 
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, text);
+            statement.setString(2, text);
+            ResultSet rs = statement.executeQuery();
+
+            Vector<ListItem> allProductsBySupplier = new Vector<>();
+            ProductInformation productInformation;
             while(rs.next()) {
-                if(rs.getString(1).toLowerCase().equals(usernameLogin.toLowerCase()) && rs.getString(2).equals(passwordLogin)) {
-                    firstname = rs.getString(3);
-
-                } else if (rs.getString(4).toLowerCase().equals(usernameLogin.toLowerCase()) && rs.getString(5).equals(passwordLogin)){
-                    firstname = rs.getString(6);
-                }
-            }
-            stmt.close();
-            rs.close();
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
-        disconnect();
-        return firstname;
-    }
-
-
-
-    *//*
-        PRODUCT RELATED
-        ---------------------------------------------------------------------------------------------------------------------------------------------------------
-     *//*
-    public boolean checkQuantity(int nbrOfItems, int productID) {
-        connect();
-
-        int quantity = 0;
-
-        try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT product_quantity FROM products WHERE (product_id) = ?");
-            stmt.setBigDecimal(1, new BigDecimal(productID));
-            ResultSet rs = stmt.executeQuery();
-
-            while(rs.next()) {
-                quantity = rs.getInt(1);
-            }
-
-            stmt.close();
-            rs.close();
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
-        if(quantity < nbrOfItems) {
-            JOptionPane.showMessageDialog(null, "You added more products than there are available");
-            return false;
-        } else {
-            int newQuantity = (quantity - nbrOfItems);
-            addProductToShoppingCart(newQuantity, productID);
-            return true;
-        }
-    }
-
-    public ArrayList<String> getAllProducts() {
-        ArrayList<String> allProducts = new ArrayList<>();
-        connect();
-        try {
-            String query =
-                    "SELECT product_id, product_name, product_quantity, product_price, product_supplier FROM products ORDER BY product_id ASC";
-
-            PreparedStatement stmt = connection.prepareStatement(query);
-            ResultSet rs = stmt.executeQuery();
-            int i = 0;
-            while(rs.next()) {
-                String productToAdd =
-                        "Code: "+ rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
-                                " | Base Price: " + rs.getString(4) + ":- | Supplier: " + rs.getString(5);
-                allProducts.add(i, productToAdd);
-                i++;
-            }
-            stmt.close();
-            rs.close();
-            disconnect();
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
-        disconnect();
-        return allProducts;
-    }
-
-    public ArrayList<String> getProductsForCustomers(){
-        ArrayList<String> products = new ArrayList<>();
-        connect();
-        String query = "";
-        int j = 0;
-
-        try{
-            query =
-                    """
-                            SELECT pt.product_id, pt.product_name, pt.product_quantity, pt.product_price, pt.product_supplier, dt.discount_reason, dt.discount_percentage\s
-                            FROM products pt
-                            INNER JOIN used_discounts udt ON pt.product_id = udt.product_id
-                            LEFT JOIN discounts dt ON dt.discount_code = udt.used_discount_id
-                            AND udt.used_discount_id = dt.discount_code
-                            WHERE udt.used_discount_enddate > CURRENT_DATE
-                            AND pt.product_quantity > 0
-                            ORDER BY pt.product_id ASC""";
-
-            PreparedStatement stmt = connection.prepareStatement(query);
-            ResultSet rs = stmt.executeQuery();
-            int i = 0;
-            while(rs.next()) {
-                String discountReason = rs.getString(6);
-                double calcDiscount = (rs.getDouble(4) * rs.getDouble(7));
-                double finalPrice = Math.round((rs.getDouble(4) - calcDiscount));
-
-                String productToAdd =
-                        "Code: "+ rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
-                                " | Price: " + finalPrice + ":- | Discount reason: " + discountReason + " | Discount Percentage: " + Math.round(rs.getDouble(7) * 100) +
-                                "% | Supplier: " + rs.getString(5);
-                products.add(i, productToAdd);
-                i++;
-                j++;
-            }
-
-            stmt.close();
-            rs.close();
-            disconnect();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        connect();
-
-        try {
-            query =
-                    """
-                            SELECT pt.product_id, pt.product_name, pt.product_quantity, pt.product_price, pt.product_supplier, dt.discount_reason, dt.discount_percentage
-                            FROM products pt
-                            LEFT JOIN discounts dt ON dt.discount_code = pt.discount_code
-                            WHERE product_quantity > 0
-                            AND discount_reason IS NULL
-                            ORDER BY pt.product_id ASC""";
-
-            PreparedStatement stmt = connection.prepareStatement(query);
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()) {
-                String discountReason = "";
-                double finalPrice = 0;
-                String productToAdd = "";
-
-                discountReason = "None";
-                finalPrice = rs.getDouble(4);
-                productToAdd =
-                        "Code: " + rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
-                                " | Price: " + finalPrice + ":- | Discount reason: " + discountReason +
-                                " | Supplier: " + rs.getString(5);
-                products.add(j, productToAdd);
-                j++;
-            }
-
-            stmt.close();
-            rs.close();
-            disconnect();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        Collections.sort(products);
-        return products;
-    }
-
-    public ArrayList<String> getProducts() {
-        ArrayList<String> products = new ArrayList<>();
-        connect();
-        try {
-            String query =
-                    "SELECT product_name FROM products ORDER BY product_name ASC";
-
-            PreparedStatement stmt = connection.prepareStatement(query);
-
-            ResultSet rs = stmt.executeQuery();
-            int i = 0;
-            while(rs.next()) {
-                products.add(i, rs.getString(1));
-                i++;
-            }
-            stmt.close();
-            rs.close();
-            disconnect();
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
-        disconnect();
-        return products;
-    }
-
-    public ArrayList<String> getProductsForUsers() {
-        ArrayList<String> products = new ArrayList<>();
-        connect();
-        try {
-            String query =
-                    """
-                            SELECT product_name FROM products 
-                            WHERE product_quantity > 0
-                            ORDER BY product_name ASC""";
-
-            PreparedStatement stmt = connection.prepareStatement(query);
-
-            ResultSet rs = stmt.executeQuery();
-            int i = 0;
-            while(rs.next()) {
-                products.add(i, rs.getString(1));
-                i++;
-            }
-            stmt.close();
-            rs.close();
-            disconnect();
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
-        disconnect();
-        return products;
-    }
-
-    public ArrayList<String> getOrderedProduct(int productID, int nbrOfItems) {
-        ArrayList<String> productsAdded = new ArrayList<>();
-
-        return productsAdded;
-    }
-
-    *//*
-      DISCOUNT RELATED
-      ---------------------------------------------------------------------------------------------------------------------------------------------------------
-   *//*
-    public ArrayList<String> getUsedDiscounts() {
-        ArrayList<String> usedDiscounts = new ArrayList<>();
-
-        connect();
-        try {
-            String query =
-                    """
-                            SELECT pt.product_name, udt.used_discount_startdate, udt.used_discount_enddate, dt.discount_percentage, dt.discount_reason, pt.product_price
-                            FROM used_discounts udt
-                            INNER JOIN products pt on udt.product_id = pt.product_id
-                            LEFT JOIN discounts dt on udt.used_discount_id = dt.discount_code
-                            WHERE udt.product_id = pt.product_id
-                            ORDER BY dt.discount_reason ASC""";
-
-            PreparedStatement stmt = connection.prepareStatement(query);
-            ResultSet rs = stmt.executeQuery();
-            int i = 0;
-            while(rs.next()) {
-                double percentage = (Math.round(rs.getDouble(4) * 100));
-                double calcDiscount = (rs.getDouble(6) * rs.getDouble(4));
-                double finalPrice = Math.round((rs.getDouble(6) - calcDiscount));
-
-                String strUsedDiscounts =
-                        rs.getString(1) + " | " + rs.getString(2) + "-" +
-                                rs.getString(3) + " | " + percentage + "% | " +
-                                rs.getString(5) + " | " + finalPrice + ":-";
-
-                usedDiscounts.add(i, strUsedDiscounts);
-                i++;
-            }
-            stmt.close();
-            rs.close();
-            disconnect();
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
-        disconnect();
-        return usedDiscounts;
-    }
-
-    public ArrayList<String> getUserSearchedProducts(String searchedCode, String searchedString, String searchedProduct) {
-        ArrayList<String> searchedProductsUser = new ArrayList<>();
-        connect();
-        try {
-            String query = "";
-            if(searchedString.toLowerCase().equals("discounts")){
-                query =
-                        """
-                                SELECT pt.product_id, pt.product_name, pt.product_quantity, pt.product_price, pt.product_supplier, dt.discount_reason, dt.discount_percentage 
-                                FROM products pt
-                                INNER JOIN used_discounts udt ON pt.product_id = udt.product_id
-                                LEFT JOIN discounts dt ON dt.discount_code = udt.used_discount_id
-                                AND udt.used_discount_id = dt.discount_code
-                                WHERE product_quantity > 0
-                                AND pt.discount_code IS NOT NULL
-                                AND udt.used_discount_enddate > CURRENT_DATE
-                                ORDER BY pt.product_id ASC""";
-
-                PreparedStatement stmt = connection.prepareStatement(query);
-
-                ResultSet rs = stmt.executeQuery();
-
-                int i = 0;
-                while(rs.next()) {
-                    String discountReason = rs.getString(6);
-                    double calcDiscount = (rs.getDouble(4) * rs.getDouble(7));
-                    double finalPrice = Math.round((rs.getDouble(4) - calcDiscount));
-
-
-                    String productToAdd =
-                            "Code: "+ rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
-                                    " | Price: " + finalPrice + ":- | Discount reason: " + discountReason + " | Discount Percentage: " + Math.round(rs.getDouble(7) * 100) +
-                                    "% | Supplier: " + rs.getString(5);
-                    searchedProductsUser.add(i, productToAdd);
-                    i++;
-                }
-                stmt.close();
-                rs.close();
-            } else {
-                query =
-                        """
-                                SELECT pt.product_id, pt.product_name, pt.product_quantity, pt.product_price, pt.product_supplier, dt.discount_reason, dt.discount_percentage
-                                FROM products pt
-                                LEFT JOIN discounts dt ON dt.discount_code = pt.discount_code
-                                WHERE product_quantity > 0
-                                AND product_id = ?
-                                OR LOWER(product_name) LIKE ?
-                                OR LOWER(product_name) LIKE ?
-                                ORDER BY pt.product_id ASC""";
-
-                PreparedStatement stmt = connection.prepareStatement(query);
-
-                if(searchedCode == null){
-                    stmt.setNull(1, Types.INTEGER);
-                    stmt.setString(2, searchedString.toLowerCase());
-                    stmt.setString(3,  searchedString.toLowerCase());
+                if(rs.getInt(4) > 0) {
+                    productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getInt(4),
+                            rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
+                    ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getDiscountedPrice());
+                    allProductsBySupplier.add(listItem);
                 } else {
-                    int codeInt = Integer.parseInt(searchedCode);
-                    stmt.setBigDecimal(1, new BigDecimal(codeInt));
-                    stmt.setNull(2, Types.VARCHAR);
-                    stmt.setNull(3, Types.VARCHAR);
+                    productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), -1,
+                            rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
+                    ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getProductPrice());
+                    allProductsBySupplier.add(listItem);
                 }
 
-                ResultSet rs = stmt.executeQuery();
-
-                int i = 0;
-
-                while(rs.next()) {
-                    String discountReason = "";
-                    double calcDiscount = 1;
-                    double finalPrice = 0;
-                    String productToAdd = "";
-
-                    if(rs.getString(6) == null){
-                        discountReason = "None";
-                        finalPrice = rs.getDouble(4);
-                        productToAdd =
-                                "Code: "+ rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
-                                        " | Price: " + finalPrice + ":- | Discount reason: " + discountReason +
-                                        " | Supplier: " + rs.getString(5);
-                        searchedProductsUser.add(i, productToAdd);
-                        continue;
-
-                    } else {
-                        discountReason = rs.getString(6);
-                        calcDiscount = (rs.getDouble(4) * rs.getDouble(7));
-                        finalPrice = Math.round((rs.getDouble(4) - calcDiscount));
-                    }
-                    productToAdd =
-                            "Code: "+ rs.getString(1) + " | Name: " + rs.getString(2) + " | Quantity: " + rs.getString(3) +
-                                    " | Price: " + finalPrice + ":- | Discount reason: " + discountReason + " | Discount Percentage: " + Math.round(rs.getDouble(7) * 100) +
-                                    "% | Supplier: " + rs.getString(5);
-                    searchedProductsUser.add(i, productToAdd);
-                    i++;
-                }
-                stmt.close();
-                rs.close();
             }
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
-        disconnect();
-        return searchedProductsUser;
-    }
 
-    public ArrayList<String> getDiscounts() {
-        connect();
-        ArrayList<String> discounts = new ArrayList<String>();
-        //String[] suppliers = new String[10];
-        try {
-            String query =
-                    "SELECT discount_reason FROM discounts";
-
-            PreparedStatement stmt = connection.prepareStatement(query);
-
-            ResultSet rs = stmt.executeQuery();
-            int i = 0;
-            while(rs.next()) {
-                discounts.add(i, rs.getString(1));
-                i++;
-            }
-            stmt.close();
             rs.close();
             disconnect();
+            return allProductsBySupplier;
         } catch(SQLException e) {
             e.printStackTrace();
         }
-        return discounts;
+        return null;
     }
 
-    *//*
-     SUPPLIER RELATED
-     ---------------------------------------------------------------------------------------------------------------------------------------------------------
-  *//*
-
-
-     *//*
-      ORDER RELATED
-      ---------------------------------------------------------------------------------------------------------------------------------------------------------
-   *//*
-    public ArrayList<String> getOrdersList() {
-        ArrayList<String> orders = new ArrayList<>();
+    public static boolean isProductAvailable(int productId, int quantity) {
         connect();
 
         try {
-            PreparedStatement statement = connection.prepareStatement(
-                    """
-                    
-                    """);
+            String query = "SELECT SUM(amount) AS total\n" +
+                    "FROM stock\n" +
+                    "WHERE product_id = ?\n" +
+                    "AND status LIKE 'INLEV'\n" +
+                    "OR\n" +
+                    "product_id = ?\n" +
+                    "AND status LIKE 'RES'\n" +
+                    "OR\n" +
+                    "product_id = ?\n" +
+                    "AND status LIKE 'SHIPPED';";
+
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, productId);
+            statement.setInt(2, productId);
+            statement.setInt(3, productId);
+            ResultSet rs = statement.executeQuery();
+            int amount = -1;
+
+            while(rs.next()) {
+                amount = rs.getInt(1);
+            }
+
+            return (amount >= quantity);
+
+        } catch(SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean stockEntryExists(int productId, int orderId) {
+        connect();
+
+        try {
+            String query = "SELECT id FROM stock WHERE product_id = ? AND order_id = ?";
+
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, productId);
+            statement.setInt(2, orderId);
+            ResultSet rs = statement.executeQuery();
+
+
+            int id = -1;
+            while(rs.next()) {
+                id = rs.getInt(1);
+            }
+             System.out.println(id);
+            return (id > 0);
+
+
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static Vector<ListItem> getAllOrders(int userId) {
+        connect();
+
+        try {
+            String query = "SELECT id, date, status FROM orders WHERE user_id = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, userId);
+            Vector<ListItem> items = new Vector<>();
+
+            ResultSet rs = statement.executeQuery();
+            while(rs.next()) {
+                String itemText = rs.getInt(1) + " | " + rs.getDate(2) + " | " + rs.getString(3);
+                items.add(new ListItem(itemText, rs.getInt(1), -1));
+            }
+            rs.close();
+            disconnect();
+            return items;
+
+        } catch(SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Vector<ListItem> getAllUsersOrders() {
+        connect();
+
+        try {
+            String query = "SELECT id, date, status FROM orders WHERE status = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, "PENDING");
+            Vector<ListItem> items = new Vector<>();
+
+            ResultSet rs = statement.executeQuery();
+            while(rs.next()) {
+                String itemText = rs.getInt(1) + " | " + rs.getDate(2) + " | " + rs.getString(3);
+                items.add(new ListItem(itemText, rs.getInt(1), -1));
+            }
+            rs.close();
+            disconnect();
+            return items;
+
+        } catch(SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Vector<ListItem> getProductSales(String startDate, String endDate) {
+        connect();
+
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        java.sql.Date dateStart;
+        java.sql.Date dateEnd;
+        Vector<ListItem> listItems = new Vector<>();
+        try {
+            java.util.Date dateSt = format.parse(startDate);
+            java.util.Date dateEd = format.parse(endDate);
+            dateStart = new java.sql.Date(dateSt.getTime());
+            dateEnd = new java.sql.Date(dateEd.getTime());
+
+            String query = "SELECT SUM(st.amount) AS total, st.product_id, prod.name FROM stock st\n" +
+                    "INNER JOIN products prod ON st.product_id = prod.id\n" +
+                    "WHERE st.status LIKE 'APPROVED' \n" +
+                    "AND date BETWEEN ? and ?\n" +
+                    "GROUP BY product_id, prod.name\n" +
+                    "ORDER BY product_id DESC;";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setDate(1, dateStart);
+            statement.setDate(2, dateEnd);
             ResultSet rs = statement.executeQuery();
 
             while(rs.next()) {
-
+                listItems.add(new ListItem(rs.getString(3) + " | Amount: " + String.valueOf(rs.getInt(1)).substring(1), rs.getInt(2), 0));
             }
-            statement.close();
             rs.close();
             disconnect();
-
-        } catch (SQLException e) {
+            return listItems;
+        } catch(ParseException | SQLException e) {
             e.printStackTrace();
         }
-
-        return orders;
+        return null;
     }
 
-*/
 
+    public static Vector<ListItem> getDiscountHistory() {
+        connect();
 
+        try {
+            String query = "SELECT prod.id, prod.name, prod.price, adc.discount_id, dis.reason, sup.name, dis.percentage, (prod.price * ((100 - dis.percentage) / 100))" +
+                    "FROM products prod " +
+                    "INNER JOIN assigned_discounts adc ON prod.id = adc.product_id " +
+                    "LEFT JOIN discount dis ON adc.discount_id = dis.id " +
+                    "LEFT JOIN supplier sup ON prod.supplier_id = sup.id " +
+                    "WHERE prod.status = 'Aktiv';";
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet rs = statement.executeQuery();
+
+            Vector<ListItem> allDiscountedProducts = new Vector<>();
+            ProductInformation productInformation;
+            while(rs.next()) {
+                if(rs.getInt(4) > 0) {
+                    productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getInt(4),
+                            rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
+                    ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getDiscountedPrice());
+                    allDiscountedProducts.add(listItem);
+                } else {
+                    productInformation = new ProductInformation(rs.getInt(1), rs.getString(2), rs.getDouble(3), -1,
+                            rs.getString(5), rs.getString(6), rs.getDouble(7), rs.getDouble(8));
+                    ListItem listItem = new ListItem(productInformation.toString(), productInformation.getProductId(), productInformation.getProductPrice());
+                    allDiscountedProducts.add(listItem);
+                }
+
+            }
+
+            rs.close();
+            disconnect();
+            return allDiscountedProducts;
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Vector<ComboBoxItem> getAllDiscounts() {
+        connect();
+
+        try {
+            String query = "SELECT id, reason FROM discount;";
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet rs = statement.executeQuery();
+
+            Vector<ComboBoxItem> items = new Vector<>();
+            while(rs.next()) {
+                items.add(new ComboBoxItem(rs.getString(2), rs.getInt(1)));
+            }
+            return items;
+        } catch(SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

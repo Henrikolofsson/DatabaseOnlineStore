@@ -1,17 +1,16 @@
-package GUI.AdminPanels.ViewUsedDiscountsFrame;
+package GUI.AdminPanels.DisplayProductSaleFrame;
 
 import Controller.MainController;
-import Database.DatabaseController;
-import GUI.AdminPanels.HandleProductFrame.HandleProductPanel;
+import GUI.AdminPanels.DeleteProductFrame.DeleteProductPanel;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class ViewUsedDiscountsFrame extends JFrame {
+public class DisplayProductSaleFrame extends JFrame {
     private MainController controller;
-    private ViewUsedDiscountsPanel viewUsedDiscountsPanel;
+    private DisplayProductSalePanel displayProductSalePanel;
 
-    public ViewUsedDiscountsFrame(MainController controller) {
+    public DisplayProductSaleFrame(MainController controller) {
         this.controller = controller;
         initializeComponents();
         initializeGUI();
@@ -19,17 +18,17 @@ public class ViewUsedDiscountsFrame extends JFrame {
 
     private void initializeComponents() {
         //Default JFrame initializations
-        setTitle("Discount history");
-        setSize(new Dimension(600,600));
-        setMinimumSize(new Dimension(600, 600));
-        setPreferredSize(new Dimension(600,600));
+        setTitle("Show Product Sales");
+        setSize(new Dimension(600,450));
+        setMinimumSize(new Dimension(600, 450));
+        setPreferredSize(new Dimension(600,450));
         setDefaultCloseOperation(this.EXIT_ON_CLOSE);
         setVisible(true);
         setResizable(false);
         setBackground(Color.WHITE);
         setLayout(new GridLayout(1,2, 1, 0));
 
-        viewUsedDiscountsPanel = new ViewUsedDiscountsPanel(controller, this);
+        displayProductSalePanel = new DisplayProductSalePanel(controller, this);
     }
 
     private void initializeGUI() {
@@ -38,10 +37,9 @@ public class ViewUsedDiscountsFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(viewUsedDiscountsPanel, gbc);
+        add(displayProductSalePanel, gbc);
 
         pack();
         setLocation(new Point(300, 100));
     }
-
 }
